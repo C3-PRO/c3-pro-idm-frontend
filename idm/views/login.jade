@@ -1,0 +1,11 @@
+extends layoutout
+
+block content
+  h2 IDM Log in
+  form(action="/login", method="POST")
+    p
+        input.form-control(name="username", type="text", placeholder="ch...")
+    p
+        input.form-control(name="password", type="password", placeholder="***")
+    p
+        button.btn.btn-lg.btn-primary.btn-block(type="submit") Log in

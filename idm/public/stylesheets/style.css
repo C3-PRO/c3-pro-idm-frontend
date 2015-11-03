@@ -1,0 +1,263 @@
+
+html, body {
+	margin: 0; padding: 0;
+	background-color: rgb(238,238,238);
+}
+body {
+	font: normal 400 14pt/1.4 "Georgia Pro", Georgia, serif;
+}
+h1, h2, h3, h4, h5 {
+	font-family: Delius, serif; font-weight: 500;
+}
+h1 {
+	clear: both;
+	margin: 1.5em 0 0.6em;
+}
+h2 {
+	margin: 1.5em 0 0.7em;
+}
+p {
+	margin: 0.75em 0 0;
+}
+a {
+	text-decoration: none;
+	color: rgb(57,99,159);
+}
+a:hover {
+	text-decoration: underline;
+}
+a:visited {
+	-webkit-text-decoration-style: dotted; text-decoration-style: dotted;
+}
+
+header {
+	background-color: rgb(45,45,45);
+}
+footer {
+	min-height: 6em;
+	margin: 0; padding: 2em 0 4em;
+	font-size: 0.8em; text-align: center;
+	border-top: 1px solid rgb(160,160,160);
+}
+
+#container {
+	position: relative;
+	min-height: 70%;
+	padding: 0 1.5em 4em;
+	background: white;
+}
+
+.content {
+	max-width: 800px;
+	margin: 0 auto; padding: 0;
+}
+.content.main {
+	padding: 0 0 2em;
+}
+
+.content.login {
+	padding: 0 0 2em;
+	text-align: center;
+}
+
+#logo {
+	margin: 0; padding: 2.5em 0 12em;
+	text-align: center;
+}
+
+
+/* Classes */
+
+ul.navi {
+	margin: 0; padding: 0;
+	list-style-type: none;
+	color: rgba(255,255,255,0.5);
+}
+.navi li:before, .navi li:hover:before, .navi li::before, .navi li:hover::before {
+	content: "•";
+	margin: 0 0.5em;
+	text-decoration: none;
+}
+
+.intro {
+	margin-top: 2em;
+	font-size: 1.2em; color: rgb(120,120,120);
+}
+
+.video {
+	margin: 1.5em 0;
+}
+.iframe {
+	position: relative;
+}
+.iframe .ratio {
+	display: block;
+	width: 100%; height: auto;
+}
+.iframe iframe {
+	position: absolute;
+	top: 0; left: 0; width: 100%; height: 100%;
+}
+
+.float-left {
+	float: left;
+	margin: 0 2em 0.5em 0;
+	width: 220px; height: 220px;
+}
+
+.float-right {
+	float: right;
+	margin: 0 0 0.5em 2em;
+	width: 220px; height: 220px;
+}
+
+.download {
+	margin-top: 5em; text-align: center;
+}
+.download-top {
+	position: absolute;
+	top: 20px; right: 20px; width: 120px;
+}
+.appstore {
+	width: 180px;
+}
+.download-top .appstore {
+	width: 100%;
+}
+
+/* Header & Footer */
+header div {
+	max-width: 800px;
+	margin: 0 auto; padding: 0.75em 0 0.5em;
+	text-align: right;
+	font: normal 300 15pt/1.4 "Helvetica Neue Thin", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+header div a {
+	color: white;
+}
+
+footer > p {
+	margin-top: 2em;
+}
+footer > p:first-child {
+	margin-top: 0;
+}
+footer .resources {
+	margin-bottom: 4em;
+	display: -ms-flexbox; display: flex;
+	line-height: 200%;
+}
+footer .resources p {
+	width: 50%;
+	margin: 0; padding: 1em 0;
+	text-align: right;
+}
+footer .resources p:last-child {
+	text-align: left;
+}
+footer .resources .center {
+	width: 2px;
+	margin: 0 2em; padding: 0;
+	background-color: rgba(0,0,0,0.2);
+}
+
+
+/* Dynamic Layout */
+
+/* phones */
+@media screen and (max-width: 480px) {
+	body {
+		font-size: 12pt;
+	}
+	h1 {
+		font-size: 1.7em;
+	}
+	header div {
+		padding-left: 15px; padding-right: 15px;
+		font-size: 13pt;
+	}
+	#container {
+		padding: 0 1em 2em;
+		background-size: 600px 84px; background-position: center 5em;
+	}
+	#logo {
+		padding: 1em 0 2em;
+	}
+	#logo img {
+		width: 80%;
+	}
+	.float-left {
+		width: 110px; height: 110px;
+	}
+	.float-right {
+		width: 110px; height: 110px;
+	}
+	.download {
+		margin-top: 3em;
+	}
+	.institute {
+		width: 220px;
+	}
+}
+
+@media screen and (max-width: 350px) {
+	#container {
+		background-position: center 4em;
+	}
+}
+
+/* tablets and up */
+@media screen and (min-width: 480px) {
+	.navi li {
+		display: inline-block;
+	}
+	.navi li:first-child:before, .navi li:first-child::before {
+		content: "";
+	}
+}
+
+/* tablets */
+@media screen and (min-width: 480px) and (max-width: 1024px) {
+	body {
+		font-size: 12pt;
+	}
+	h1 {
+		font-size: 1.7em;
+	}
+	header div {
+		padding: 0.5em 20px 0.33em;
+		font-size: 13pt;
+	}
+	#container {
+		background-size: 1024px 143px; background-position: center 6em;
+	}
+	#logo {
+		padding: 1.25em 0 4em;
+	}
+	#logo img {
+		width: 333px;
+	}
+}
+
+@media screen and (max-width: 1024px) {
+	.download-top {
+		display: none;
+	}
+}
+
+/* standard */
+@media screen and (min-width: 1024px) and (max-width: 1920px) {
+	#container {
+		background-size: 1920px 269px; background-position: center 8em;
+	}
+	#logo {
+		padding: 2em 0 8em;
+	}
+}
+@media screen and (min-width: 3000px) {
+	#container {
+		background-size: 100%;
+	}
+}
+
+

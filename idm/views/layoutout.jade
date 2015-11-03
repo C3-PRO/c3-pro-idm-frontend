@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Delius')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    header
+      div
+        ul.navi
+          li
+            a(href="/login") Login
+    #container
+      .content.login
+        block content
+    footer
+      .center
+      p
+        a(href="http://www.chip.org")
+          img.institute(src="images/ResearchInstitute-web.png", srcset="images/ResearchInstitute-web@2x.png 2x, images/ResearchInstitute-web@3x.png 3x", alt="")
+      p Copyright © Boston Children's Hospital 2015
