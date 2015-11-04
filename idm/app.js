@@ -4,10 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
-var login = require('./routes/login')
+var login = require('./routes/login');
+var patients = require('./routes/patients');
+var logout = require('./routes/logout');
+
 
 var app = express();
 
@@ -23,9 +26,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({secret: 'ssshhhhh'}));
+
+
 app.use('/', routes);
-app.use('/users', users);
 app.use('/login', login);
+app.use('/logout', logout);
+app.use('/patients', patients);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -35,10 +43,9 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
-
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (app.get('env') === 'dev') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
@@ -46,18 +53,26 @@ if (app.get('env') === 'development') {
       error: err
     });
   });
+} else if (app.get('env') === 'qa') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
+    });
+  });
+} else if (app.get('env') === 'prod') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: {}
+    });
+  });
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-
 
 module.exports = app;
 var server = app.listen(8080, function() {

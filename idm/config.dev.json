@@ -1,0 +1,16 @@
+{
+  "patients":
+  {
+    "host":"localhost",
+    "port":8080,
+    "protocol":"http",
+    "endpoint":"/c3pro-idm/patients"
+  },
+  "patient":
+  {
+    "host":"localhost",
+    "port":8080,
+    "protocol":"http",
+    "endpoint":"/c3pro-idm/patient"
+  }
+}

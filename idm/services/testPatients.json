@@ -1,0 +1,35 @@
+{
+  "patients":
+  [
+    {
+      "id": "123456",
+      "email": "johndoe@johndoe.com",
+      "sssid": "sssid1",
+      "state": "Enrolled"
+    },
+    {
+      "id": "123457",
+      "email": "alice@alicedoe.com",
+      "sssid": "sssid2",
+      "state": "Enrolled"
+    },
+    {
+      "id": "123458",
+      "email": "bob@bobdoe.com",
+      "sssid": "sssid3",
+      "state": "Sent Invitation"
+    },
+    {
+      "id": "123459",
+      "email": "carol@carol.com",
+      "sssid": "sssid4",
+      "state": "Sent Invitation"
+    },
+    {
+      "id": "123460",
+      "email": "dave@davedoe.com",
+      "sssid": "sssid5",
+      "state": "Created"
+    }
+  ]
+}
