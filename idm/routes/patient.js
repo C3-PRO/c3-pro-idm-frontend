@@ -98,7 +98,7 @@ function updatePatient(req,res) {
         } else {
             opt.res.render('msg', {
                 "message": "Patient updated succesfully",
-                "okref:": "/subjects"
+                "okref": "/patients"
             })
         }
     });
@@ -134,7 +134,7 @@ function newPatient(req,res) {
         } else {
             opt.res.render('msg', {
                 "message": "Patient created succesfully",
-                "okref:": "/subjects"
+                "okref": "/patients"
             })
         }
     });
