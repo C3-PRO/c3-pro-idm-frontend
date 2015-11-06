@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= message
+  button(onclick='move()') Continue
+  script.
+    function move() {
+      window.location.href = '#{okref}'
+    }

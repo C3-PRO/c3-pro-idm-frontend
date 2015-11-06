@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h2 Update subject information
+  form(action="/patient", method="POST")
+    p   SSSID:
+    p
+        input.form-control(name="sssid", type="text", placeholder="1234...", value=value='#{patient.sssid}')
+    p   eMail:
+    p
+        input.form-control(name="eMail", type="text", placeholder="johndoe@...", value='#{patient.email}')
+    p
+        input.form-control(name="id", type="hidden", value="#{patient.id}")
+    p
+        button(type="submit") Update
+        button(onclick='move()') Cancel
+
+    if !(typeof errMessage === 'undefined')
+        h2.errormsg= errMessage
+
+  script.
+        function move() {
+          window.location.href = '/patients'
+        }

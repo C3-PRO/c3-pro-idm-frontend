@@ -2,17 +2,19 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Delius')
+    link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    header
-      div
-        ul.navi
-          li
-            a(href="/login") Login
-    #container
-      .content.login
-        block content
+    div#page-wrapper
+      div#header
+        nav#nav
+          ul
+            li
+              a(href="/login") Login
+
+    section.wrapper.style1
+          div.container.login
+            block content
     footer
       .center
       p

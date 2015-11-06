@@ -9,10 +9,14 @@ block content
         td State
 
     for patient in patients
-        tr
+        tr(onclick='move(#{patient.id})')
           td= patient.sssid
           td= patient.email
           td= patient.state
-          td(style="display:none")= patient.id
     else
       li no patients
+
+  script.
+      function move(id) {
+        window.location.href = '/patient/'+ id
+      }

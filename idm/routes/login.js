@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var service = require('../services/oauth');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -14,10 +15,17 @@ router.get('/', function(req, res, next) {
 /* POST for log in*/
 
 router.post('/', function(req, res, next) {
-    var sess=req.session;
-    sess.username = req.body.username;
-    sess.password = req.body.password;
-    res.redirect('/patients');
+    var opt = {
+        "key": req.body.username + ":" + req.body.password,
+        "sess": req.session,
+        "username": req.body.username
+    };
+    service.oauth(opt,function (username, token, sess) {
+        sess.username = username;
+        sess.token = token;
+        res.redirect('/patients');
+    });
+
 });
 
 module.exports = router;

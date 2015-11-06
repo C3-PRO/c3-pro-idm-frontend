@@ -5,27 +5,31 @@ var service = require('../services/patients');
 router.get('/', function(req, res, next) {
     var sess=req.session;
     if (sess.username) {
-        var key = sess.username + ":" + sess.password;
-        var opt = {"key":key};
-        var data = service.getPatients(opt);
-        if (data.statusCode === 401) {
-            req.session.destroy(function(err){
-                if(err) {
-                    console.log(err);
+        var opt = {
+            "token": sess.token,
+            "sess": sess,
+            "res": res
+        };
+        service.getPatients(opt, function(data, opt){
+            if (data.statusCode >= 400) {
+                var err = '';
+                if (data.error != null) {
+                    err = data.error.message
                 } else {
-                    res.redirect('/');
+                    err = "HTTP Error getting patients lists"
                 }
-            });
-        } else if (data.statusCode >= 400) {
-            var data = {
-                message:data.error.message,
-                error: error
-            };
-            res.render('error', data);
-        } else {
-            res.render('subjects', data.body);
-        }
-
+                var x = {
+                    message:err,
+                    error: {
+                        "status": data.statusCode,
+                        "stack": err
+                    }
+                };
+                opt.res.render('error', x);
+            } else {
+                opt.res.render('subjects', data.body);
+            }
+        });
     } else {
         res.redirect('/login');
     }

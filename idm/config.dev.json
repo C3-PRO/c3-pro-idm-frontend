@@ -12,5 +12,11 @@
     "port":8080,
     "protocol":"http",
     "endpoint":"/c3pro-idm/patient"
+  },
+  "oauth": {
+    "host": "localhost",
+    "port": 8080,
+    "protocol": "http",
+    "endpoint": "/c3pro-idm/oauth"
   }
 }

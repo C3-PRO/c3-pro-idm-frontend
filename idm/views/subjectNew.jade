@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h2 New subject
+  form(action="/patient", method="POST")
+    p   SSSID:
+    p
+        input.form-control(name="sssid", type="text", placeholder="1234...")
+    p   eMail:
+    p
+        input.form-control(name="eMail", type="text", placeholder="johndoe@...")
+    p
+        button.btn.btn-lg.btn-primary.btn-block(type="submit") Add
+        button.btn.btn-lg.btn-primary.btn-block(onclick='move()') Cancel
+
+  if !(typeof errMessage === 'undefined')
+    h2.errormsg= errMessage
+
+  script.
+      function move() {
+        window.location.href = '/patients'
+      }
