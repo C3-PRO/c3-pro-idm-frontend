@@ -63,7 +63,7 @@ exports.getPatient = function (opt, func) {
 exports.newPatient = function (opt, patient, func) {
     var options = setBaseOptions(opt, config.patient.endpoint, 'POST');
     options.headers["Content-Type"] = "application/json";
-    options.body = patient;
+    options.body = JSON.stringify(patient);
     request(options, function (error, response, body) {
         console.log(response.statusCode)
         data = {
@@ -87,9 +87,9 @@ exports.newPatient = function (opt, patient, func) {
 }
 
 exports.updatePatient = function (opt, patient, func) {
-    var options = setBaseOptions(opt, config.patient.endpoint, 'PUT');
+    var options = setBaseOptions(opt, config.patient.endpoint+"/"+patient.id, 'PUT');
     options.headers["Content-Type"] = "application/json";
-    options.body = patient;
+    options.body = JSON.stringify(patient);
     request(options, function (error, response, body) {
         console.log(response.statusCode)
         data = {
@@ -117,7 +117,7 @@ function setBaseOptions(opt, endpoint, method) {
         uri: config.patients.protocol + "://" + config.patients.host + ":" + config.patients.port + endpoint,
         method : method,
         headers: {
-            'Authentication': 'Bearer ' + opt.token
+            'Authorization': 'Bearer ' + opt.token
         }
     }
     return options;

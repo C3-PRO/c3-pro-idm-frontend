@@ -32,7 +32,7 @@ router.get('/:id', function(req, res, next) {
                 };
                 opt.res.render('error', x);
             } else {
-                opt.res.render('subject', data.body);
+                opt.res.render('subject', JSON.parse(data.body));
             }
         });
     } else {
@@ -68,6 +68,7 @@ router.post('/', function(req, res, next) {
 });
 
 function updatePatient(req,res) {
+    console.log("update");
     var sess=req.session;
     var patient = {
         "patient": {
@@ -82,7 +83,7 @@ function updatePatient(req,res) {
         "res": res
     };
     service.updatePatient(opt, patient, function (data, patient, opt) {
-        if (data.statusCode == 403) {
+        if (data.statusCode == 400) {
             /* Valudation problem. So, we render the same that we had, showing an error message */
             opt.res.render('subject', {
                 "patient": patient.patient,
@@ -90,7 +91,7 @@ function updatePatient(req,res) {
             });
         }
 
-        else if (data.statusCode >= 400) {
+        else if (data.statusCode > 400) {
             opt.res.render('subject', {
                 "patient": patient.patient,
                 "errMessage": data.statusCode
@@ -105,6 +106,7 @@ function updatePatient(req,res) {
 }
 
 function newPatient(req,res) {
+    console.log("new");
     var sess=req.session;
     var patient = {
         "patient": {
@@ -117,16 +119,16 @@ function newPatient(req,res) {
         "sess":sess,
         "res": res
     };
-    service.updatePatient(opt, patient, function (data, patient, opt) {
-        if (data.statusCode == 403) {
-            /* Valudation problem. So, we render the same that we had, showing an error message */
+    service.newPatient(opt, patient, function (data, patient, opt) {
+        if (data.statusCode == 400) {
+            /* Validation problem. So, we render the same that we had, showing an error message */
             opt.res.render('subjectNew', {
                 "patient": patient.patient,
                 "errMessage": data.body.error
             });
         }
 
-        else if (data.statusCode >= 400) {
+        else if (data.statusCode > 400) {
             opt.res.render('subject', {
                 "patient": patient.patient,
                 "errMessage": data.statusCode

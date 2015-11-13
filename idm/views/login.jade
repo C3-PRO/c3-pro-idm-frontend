@@ -9,3 +9,6 @@ block content
         input.form-control(name="password", type="password", placeholder="***")
     p
         button(type="submit") Log in
+
+  if !(typeof errMessage === 'undefined')
+    p.errormsg= errMessage

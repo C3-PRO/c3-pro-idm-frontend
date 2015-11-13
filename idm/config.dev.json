@@ -1,22 +1,22 @@
 {
   "patients":
   {
-    "host":"localhost",
-    "port":8080,
+    "host":"10.17.20.35",
+    "port":9096,
     "protocol":"http",
-    "endpoint":"/c3pro-idm/patients"
+    "endpoint":"/c3pro-idm-service/rest/patientapi/patient"
   },
   "patient":
   {
-    "host":"localhost",
-    "port":8080,
+    "host":"10.17.20.35",
+    "port":9096,
     "protocol":"http",
-    "endpoint":"/c3pro-idm/patient"
+    "endpoint":"/c3pro-idm-service/rest/patientapi/patient"
   },
   "oauth": {
-    "host": "localhost",
-    "port": 8080,
+    "host": "10.17.20.35",
+    "port": 9096,
     "protocol": "http",
-    "endpoint": "/c3pro-idm/oauth"
+    "endpoint": "/c3pro-idm-service/oauth"
   }
 }

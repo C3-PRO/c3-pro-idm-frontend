@@ -15,14 +15,17 @@ router.get('/', function(req, res, next) {
 /* POST for log in*/
 
 router.post('/', function(req, res, next) {
+    console.log(req.body.username + ":" + req.body.password);
     var opt = {
         "key": req.body.username + ":" + req.body.password,
         "sess": req.session,
-        "username": req.body.username
+        "username": req.body.username,
+        "res":res
     };
     service.oauth(opt,function (username, token, sess) {
         sess.username = username;
         sess.token = token;
+        console.log(token);
         res.redirect('/patients');
     });
 

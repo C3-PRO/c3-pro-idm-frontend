@@ -24,6 +24,9 @@ a:visited {
 
 
 /* Classes */
+.errormsg {
+	color: firebrick;
+}
 
 .reduced {
 	max-width: 70%;
