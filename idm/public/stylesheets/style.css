@@ -187,35 +187,83 @@ footer p:first-child {
 
 /* Tables */
 
-table {
-	width: 100%;
+.pure-table {
+	/* Remove spacing between table cells (from Normalize.css) */
+	border-collapse: collapse;
+	border-spacing: 0;
+	empty-cells: show;
+	border: 1px solid #cbcbcb;
+	width:100%;
+	height:100%;
+	margin:0px;padding:0px;
 }
 
-table.default {
-	width: 100%;
+.pure-table caption {
+	color: #000;
+	font: italic 85%/1 arial, sans-serif;
+	padding: 1em 0;
+	text-align: center;
 }
 
-table.default tbody tr {
-	border-bottom: solid 1px #e0e0e0;
+.pure-table td,
+.pure-table th {
+	border-left: 1px solid #cbcbcb;/*  inner column border */
+	border-width: 0 0 0 1px;
+	font-size: inherit;
+	margin: 0;
+	overflow: visible; /*to make ths where the title is really long work*/
+	padding: 0.5em 1em; /* cell padding */
 }
 
-table.default td {
-	padding: 0.5em 1em 0.5em 1em;
+/* Consider removing this next declaration block, as it causes problems when
+there's a rowspan on the first cell. Case added to the tests. issue#432 */
+.pure-table td:first-child,
+.pure-table th:first-child {
+	border-left-width: 0;
 }
 
-table.default th {
-	font-weight: 600;
-	padding: 0.5em 1em 0.5em 1em;
+.pure-table thead {
+	background-color: rgb(57,99,159);/*#e0e0e0;*/
+	color: white;/*#000;*/
 	text-align: left;
+	vertical-align: bottom;
 }
 
-table.default thead {
-	background-color: #555555;
-	background-image: -moz-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
-	background-image: -webkit-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
-	background-image: -ms-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
-	background-image: linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
-	color: #fff;
+/*
+striping:
+   even - #fff (white)
+   odd  - #f2f2f2 (light gray)
+*/
+.pure-table th {
+	background-color: transparent;
+}
+.pure-table-odd td {
+	background-color: #f2f2f2;
+}
+
+/* nth-child selector for modern browsers */
+.pure-table-striped tr:nth-child(2n-1) td {
+	background-color: #f2f2f2;
+}
+
+/* BORDERED TABLES */
+.pure-table-bordered td {
+	border-bottom: 1px solid #cbcbcb;
+}
+.pure-table-bordered tbody > tr:last-child > td {
+	border-bottom-width: 0;
+}
+
+
+/* HORIZONTAL BORDERED TABLES */
+
+.pure-table-horizontal td,
+.pure-table-horizontal th {
+	border-width: 0 0 1px 0;
+	border-bottom: 1px solid #cbcbcb;
+}
+.pure-table-horizontal tbody > tr:last-child > td {
+	border-bottom-width: 0;
 }
 
 /* Button */

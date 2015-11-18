@@ -2,19 +2,33 @@ extends layout
 
 block content
   .center
-  table.CSSTableGenerator
-    tr
-        td SSSID
-        td eMail
-        td State
+  table.pure-table
+    thead
+        tr
+            th SSSID
+            th eMail
+            th State
 
-    for patient in patients
-        tr(onclick='move(#{patient.id})')
-          td= patient.sssid
-          td= patient.email
-          td= patient.state
-    else
-      li no patients
+    tbody
+        - var b = 0
+        for patient in patients
+            if (b==0)
+                - b = 1
+                tr.pure-table-odd(onclick="move('#{patient.id}');return false;")
+                    td
+                        a(href='/patient/#{patient.id}')= patient.sssid
+                    td= patient.email
+                    td= patient.state.state
+            else
+                - b=0
+                tr(onclick="move('#{patient.id}');return false;")
+                    td
+                        a(href='/patient/#{patient.id}')= patient.sssid
+                    td= patient.email
+                    td= patient.state.state
+
+        else
+          li no patients
 
   script.
       function move(id) {

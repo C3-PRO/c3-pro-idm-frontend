@@ -4,6 +4,6 @@
   "id": "123456",
   "email": "johndoe@johndoe.com",
   "sssid": "sssid1",
-  "state": "Enrolled"
+  "state": {"id": 0, "state":"Enrolled"}
   }
 }
