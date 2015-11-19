@@ -4,17 +4,25 @@ block content
   h2 New subject
   form(action="/patient", method="POST")
     p   SSSID:
-    p
-        input.form-control(name="sssid", type="text", placeholder="1234...")
+    if (typeof patient === 'undefined')
+        p
+            input.form-control(name="sssid", type="text", placeholder="1234...")
+    else
+        p
+            input.form-control(name="sssid", type="text", placeholder="1234...", value= "#{patient.sssid}")
     p   eMail:
-    p
-        input.form-control(name="eMail", type="text", placeholder="johndoe@...")
+    if (typeof patient === 'undefined')
+        p
+            input.form-control(name="email", type="text", placeholder="johndoe@...")
+    else
+        p
+            input.form-control(name="email", type="text", placeholder="johndoe@...", value="#{patient.email}" )
     p
         button.btn.btn-lg.btn-primary.btn-block(type="submit") Add
         button(onclick="move();return false;") Cancel
 
   if !(typeof errMessage === 'undefined')
-    h2.errormsg= errMessage
+    p.errormsg= errMessage
 
   script.
       function move() {

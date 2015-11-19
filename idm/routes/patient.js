@@ -54,11 +54,11 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     var sess=req.session;
     if (sess.username) {
-        if (req.body.id) {
-            // This is a post with a new patient
+        if (req.body.idef) {
+            // This is a post for an update
             updatePatient(req, res);
         } else {
-            // Update patient info
+            // This is a port for a new patient
             newPatient(req, res);
         }
 
@@ -68,13 +68,13 @@ router.post('/', function(req, res, next) {
 });
 
 function updatePatient(req,res) {
-    console.log("update");
+    console.log("update:" + req.body.idef);
     var sess=req.session;
     var patient = {
         "patient": {
             "sssid": req.body.sssid,
             "email": req.body.email,
-            "id": req.body.id
+            "id": req.body.idef
         }
     };
     var opt = {
@@ -84,10 +84,11 @@ function updatePatient(req,res) {
     };
     service.updatePatient(opt, patient, function (data, patient, opt) {
         if (data.statusCode == 400) {
-            /* Valudation problem. So, we render the same that we had, showing an error message */
+            /* Validation problem. So, we render the same that we had, showing an error message */
+            var resp = JSON.parse( data.body );
             opt.res.render('subject', {
                 "patient": patient.patient,
-                "errMessage": data.body.error
+                "errMessage": resp.error
             });
         }
 
@@ -98,7 +99,7 @@ function updatePatient(req,res) {
             });
         } else {
             opt.res.render('msg', {
-                "message": "Patient updated succesfully",
+                "message": "Patient updated successfully",
                 "okref": "/patients"
             })
         }
@@ -122,9 +123,10 @@ function newPatient(req,res) {
     service.newPatient(opt, patient, function (data, patient, opt) {
         if (data.statusCode == 400) {
             /* Validation problem. So, we render the same that we had, showing an error message */
+            var resp = JSON.parse( data.body );
             opt.res.render('subjectNew', {
                 "patient": patient.patient,
-                "errMessage": data.body.error
+                "errMessage": resp.error
             });
         }
 
@@ -135,7 +137,7 @@ function newPatient(req,res) {
             });
         } else {
             opt.res.render('msg', {
-                "message": "Patient created succesfully",
+                "message": "Patient created successfully",
                 "okref": "/patients"
             })
         }

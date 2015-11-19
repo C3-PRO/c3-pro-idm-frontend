@@ -5,18 +5,18 @@ block content
   form(action="/patient", method="POST")
     p   SSSID:
     p
-        input.form-control(name="sssid", type="text", placeholder="1234...", value=value='#{patient.sssid}')
+        input.form-control(name="sssid", type="text", placeholder="1234...", value='#{patient.sssid}')
     p   eMail:
     p
-        input.form-control(name="eMail", type="text", placeholder="johndoe@...", value='#{patient.email}')
+        input.form-control(name="email", type="text", placeholder="johndoe@...", value='#{patient.email}')
     p
-        input.form-control(name="id", type="hidden", value="#{patient.id}")
+        input.form-control(name="idef", type="text", value="#{patient.id}", style="visibility:hidden;")
     p
         button(type="submit") Update
         button(onclick="move();return false;") Cancel
 
     if !(typeof errMessage === 'undefined')
-        h2.errormsg= errMessage
+        p.errormsg= errMessage
 
   script.
         function move() {

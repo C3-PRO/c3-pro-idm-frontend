@@ -1,13 +1,25 @@
 extends layout
 
 block content
+  script.
+      function move(id) {
+        window.location.href = '/patient/'+ id
+      }
+
+  - function convert (epoch) {
+  -     var date = new Date(epoch);
+  -     return (date.getMonth()+1) + "/" + date.getDate() +  "/" + date.getFullYear() ;
+  - }
   .center
   table.pure-table
     thead
         tr
+            th #
             th SSSID
             th eMail
             th State
+            th Creation
+            th Change State
 
     tbody
         - var b = 0
@@ -15,22 +27,41 @@ block content
             if (b==0)
                 - b = 1
                 tr.pure-table-odd(onclick="move('#{patient.id}');return false;")
+                    case patient.state.id
+                        when 0
+                            td
+                                img(src='/images/state0.png')
+                        when 1
+                            td
+                                img(src='/images/state1.png')
+                        when 2
+                            td
+                                img(src='/images/state2.png')
                     td
                         a(href='/patient/#{patient.id}')= patient.sssid
                     td= patient.email
                     td= patient.state.state
+                    td #{convert(patient.creationDate)}
+                    td #{convert(patient.changeStateDate)}
             else
                 - b=0
                 tr(onclick="move('#{patient.id}');return false;")
+                    case patient.state.id
+                        when 0
+                            td
+                                img(src='/images/state0.png')
+                        when 1
+                            td
+                                img(src='/images/state1.png')
+                        when 2
+                            td
+                                img(src='/images/state2.png')
                     td
                         a(href='/patient/#{patient.id}')= patient.sssid
                     td= patient.email
                     td= patient.state.state
+                    td #{convert(patient.creationDate)}
+                    td #{convert(patient.changeStateDate)}
 
         else
           li no patients
-
-  script.
-      function move(id) {
-        window.location.href = '/patient/'+ id
-      }
