@@ -28,6 +28,10 @@ a:visited {
 	color: firebrick;
 }
 
+.okmsg {
+	color: green;
+}
+
 .reduced {
 	max-width: 70%;
 	height: auto;

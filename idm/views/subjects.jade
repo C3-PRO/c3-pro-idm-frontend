@@ -10,6 +10,7 @@ block content
   -     var date = new Date(epoch);
   -     return (date.getMonth()+1) + "/" + date.getDate() +  "/" + date.getFullYear() ;
   - }
+
   .center
   table.pure-table
     thead
@@ -20,13 +21,14 @@ block content
             th State
             th Creation
             th Change State
+            th Actions
 
     tbody
         - var b = 0
         for patient in patients
             if (b==0)
                 - b = 1
-                tr.pure-table-odd(onclick="move('#{patient.id}');return false;")
+                tr.pure-table-odd
                     case patient.state.id
                         when 0
                             td
@@ -43,9 +45,13 @@ block content
                     td= patient.state.state
                     td #{convert(patient.creationDate)}
                     td #{convert(patient.changeStateDate)}
+                    td
+                        if patient.state.id!=2
+                            a(href='/mail/#{patient.id}')
+                                img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
             else
                 - b=0
-                tr(onclick="move('#{patient.id}');return false;")
+                tr
                     case patient.state.id
                         when 0
                             td
@@ -62,6 +68,16 @@ block content
                     td= patient.state.state
                     td #{convert(patient.creationDate)}
                     td #{convert(patient.changeStateDate)}
+                    td
+                        if patient.state.id!=2
+                            a(href='/mail/#{patient.id}')
+                                img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
 
         else
           li no patients
+
+  if !(typeof errMessage === 'undefined')
+    p.errormsg= errMessage
+
+  if !(typeof okMessage === 'undefined')
+      p.okmsg= okMessage
