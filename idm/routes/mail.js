@@ -17,18 +17,60 @@ router.get('/:id', function(req, res, next) {
         };
         service.mail(opt, function (data, opt) {
             if (data.statusCode >= 400) {
-                var err = '';
-                if (data.error != null) {
-                    err = data.error.message
-                } else {
-                    err = "HTTP Error getting patient"
-                }
-                opt.res.render('subjects', {
-                    "errMessage": err
+                opt.error = data.error;
+
+                servicePat.getPatients(opt, function(data, opt){
+                    var errmsg = "";
+                    if (opt.error!=null)  {
+                        errmsg = ": " + opt.error;
+                    }
+                    if (data.statusCode >= 400) {
+                        var err = 'Invitation Mail has NOT been sent successfully' + errmsg + ".";
+                        if (data.error != null) {
+                            err = err + " Moreover, we got the following error when retrieving " +
+                                "the list of patients: " + data.error.message;
+                        } else {
+                            err = "Moreover, we got an unspecified HTTP error getting patients list"
+                        }
+                        var x = {
+                            message:err,
+                            error: {
+                                "status": data.statusCode,
+                                "stack": err
+                            }
+                        };
+                        opt.res.render('error', x);
+                    } else {
+                        opt.res.render('subjects', {
+                            "patients": JSON.parse(data.body).patients,
+                            "errMessage": "Error sending the Invitation mail" + errmsg
+                        });
+                    }
                 });
             } else {
-                opt.res.render('subjects', {
-                    "okMessage": "Invitation sent successfully"
+                servicePat.getPatients(opt, function(data, opt){
+                    if (data.statusCode >= 400) {
+                        var err = 'Mail has been sent successfully.';
+                        if (data.error != null) {
+                            err = err + " However, we got the following error when retrieving " +
+                                "the list of patients: " + data.error.message;
+                        } else {
+                            err = "However, we got an unspecified HTTP error getting patients list"
+                        }
+                        var x = {
+                            message:err,
+                            error: {
+                                "status": data.statusCode,
+                                "stack": err
+                            }
+                        };
+                        opt.res.render('error', x);
+                    } else {
+                        opt.res.render('subjects', {
+                            "patients": JSON.parse(data.body).patients,
+                            "okMessage": "Invitation mail sent successfully"
+                        });
+                    }
                 });
             }
         });
