@@ -1,29 +1,21 @@
-# README #
+# C3PRO-IDM-FRONTEND #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+C3PRO-IDM-FRONTEND is a web-based application that implements a simple Identity and Demographics Manager system for myC3PRO project. It's used to send enrollment invitations to patients using the mobile iOS app and to link the invitation with the patient's sssid. 
 
-### What is this repository for? ###
+The system manages PHI data, and it's supposed to run in a site's intranet. The system does not access directly any database. Data access is wrapped through [C3PRO-IDM_SERVICE](https://bitbucket.org/ihlchip/c3pro-idm-service) system, whiCH publishes a secured API for this purpose.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+# Configuration and Deployment #
 
-### How do I get set up? ###
+## Dependencies ##
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+[C3PRO-IDM_SERVICE](https://bitbucket.org/ihlchip/c3pro-idm-service): A server deploying this system is needed. The access to C3PRO-IDM_SERVICE api methods can be configured through the config files of the project. See below.
 
-### Contribution guidelines ###
+## Installing Node.js and dependencies ##
 
-* Writing tests
-* Code review
-* Other guidelines
+The system runs on *Node.js* and uses *npm* to start the server. To install the basic tools in a Debian-based Linux distribution: 
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+    sudo apt-get clean
+    sudo apt-get update
+    sudo apt-get -y install nodejs
+    sudo apt-get -y install npm
+    sudo apt-get -y install nodejs-legacy
