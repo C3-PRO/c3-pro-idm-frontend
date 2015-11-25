@@ -26,7 +26,7 @@ The following command installs all the packages listed in *idm/package.json*
 
 ```
 #!shell
-$C3PRO-IDM-FRONTENT_HOME/idm/npm install
+$PROJECT_HOME/idm/npm install
 ```
 
 ## Starting the server ##
@@ -35,5 +35,5 @@ The following command starts the web server on port 8080
 
 ```
 #!shell
-$C3PRO-IDM-FRONTENT_HOME/idm/npm start
+$PROJECT_HOME/idm/npm start
 ```
