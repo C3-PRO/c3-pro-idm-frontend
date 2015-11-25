@@ -10,7 +10,7 @@ The system manages PHI data, and it's supposed to run in a site's intranet. The 
 
 [C3PRO-IDM_SERVICE](https://bitbucket.org/ihlchip/c3pro-idm-service): A server deploying this system is needed. The access to C3PRO-IDM_SERVICE api methods can be configured through the config files of the project. See below.
 
-## Installing Node.js and dependencies ##
+## Installing Node.js ##
 
 The system runs on *Node.js* and uses *npm* to start the server. To install the basic tools in a Debian-based Linux distribution: 
 
@@ -19,3 +19,21 @@ The system runs on *Node.js* and uses *npm* to start the server. To install the 
     sudo apt-get -y install nodejs
     sudo apt-get -y install npm
     sudo apt-get -y install nodejs-legacy
+
+## Installing Node.js dependencies ##
+
+The following command installs all the packages listed in *idm/package.json*
+
+```
+#!shell
+$C3PRO-IDM-FRONTENT_HOME/idm/npm install
+```
+
+## Starting the server ##
+
+The following command starts the web server on port 8080
+
+```
+#!shell
+$C3PRO-IDM-FRONTENT_HOME/idm/npm start
+```
