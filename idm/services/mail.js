@@ -44,3 +44,16 @@ function setBaseOptions(opt, endpoint, method) {
     }
     return options;
 }
+
+// For testing purposes only
+if (app.get('env') === 'test') {
+    var exports = module.exports = {};
+    exports.mail = function (opt, func) {
+        var data = {
+            statusCode: 200,
+            body:'',
+            error:''
+        };
+        func(data, opt);
+    }
+}
