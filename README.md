@@ -50,7 +50,7 @@ $PROJECT_HOME/idm/npm start
 
 If *NODE_ENV* is not defined, the application runs in *dev*.
 
-## Property files## 
+## Property files
 
 Properties for each environment are defined in the following json files:
 
