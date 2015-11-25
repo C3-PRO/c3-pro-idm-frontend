@@ -76,4 +76,5 @@ $PROJECT_HOME/idm/npm start
 ```
 
 To access the web app: [http://localhost:8080](http://localhost:8080)
+
 The login is also mocked. Whatever login will be acceptable.
