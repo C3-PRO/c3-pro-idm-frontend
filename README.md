@@ -60,7 +60,7 @@ Properties for each environment are defined in the following json files:
 
 They specify the host, port, http protocol and end points of the C3PRO-IDM-SERVICE api methods. 
 
-## The test environment## 
+## The test environment
 
 This environment uses mock services and does not require access to C3PRO-IDM-SERVICE. Is it useful   for purely front-end tests and fast demos. The data that appears there is written in static files in the following locations:
 
