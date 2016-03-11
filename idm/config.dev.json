@@ -1,4 +1,8 @@
 {
+  "app":
+  {
+    "perpage":5
+  },
   "patients":
   {
     "host":"10.17.20.35",

@@ -8,7 +8,8 @@ block content
     p
         input.form-control(name="password", type="password", placeholder="***")
     p
-        button(type="submit") Log in
+        button(type="submit")
+            i.fa.fa-sign-in &nbsp;Log in
 
   if !(typeof errMessage === 'undefined')
     p.errormsg= errMessage

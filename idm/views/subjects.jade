@@ -81,6 +81,40 @@ block content
         else
           li no patients
 
+  table
+    thead
+        tr
+            - var lastPage = Math.floor(total/perpage);
+            - if (lastPage*perpage == total) lastPage = lastPage -1;
+            - var r = ' ' + (page+1) + ' of ' + (lastPage+1) + ' '
+            - var currPage = page + 1
+                th
+                    if page != 0
+                        a(href='/patients/0/#{perpage}')
+                            i.fa.fa-fast-backward
+                    else
+                        i.fa.fa-fast-backward
+                th
+                    if page != 0
+                        a(href='/patients/#{page-1}/#{perpage}')
+                            i.fa.fa-backward
+                    else
+                        i.fa.fa-backward
+                th
+                    p= r
+                th
+                    if page != lastPage
+                        a(href='/patients/#{page+1}/#{perpage}')
+                            i.fa.fa-forward
+                    else
+                        i.fa.fa-forward
+                th
+                    if page != lastPage
+                        a(href='/patients/#{lastPage}/#{perpage}')
+                            i.fa.fa-fast-forward
+                    else
+                        i.fa.fa-fast-forward
+
   if !(typeof errMessage === 'undefined')
     p.errormsg= errMessage
 

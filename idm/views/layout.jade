@@ -10,11 +10,17 @@ html
         nav#nav
           ul
             li
-              a(href="/patient") New Subject
+              a(href="/patient")
+                i.fa.fa-plus
+                  p New Subject
             li
-              a(href="/patients") Subjects
+              a(href="/patients")
+                i.fa.fa-list-alt
+                  p Subjects
             li
-              a(href="/logout") Logout
+              a(href="/logout")
+                i.fa.fa-sign-out
+                  p Logout
     section.wrapper.style1
       div.container
         block content

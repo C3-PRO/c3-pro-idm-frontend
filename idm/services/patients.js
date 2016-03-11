@@ -12,7 +12,7 @@ var app = express();
 
 exports.getPatients = function (opt, func) {
     var patientId = opt.patientId;
-    var options = setBaseOptions(opt, config.patients.endpoint, 'GET');
+    var options = setBaseOptions(opt, config.patients.endpoint + '?page='+opt.page+'&perpage='+opt.perpage, 'GET');
 
     request(options, function (error, response, body) {
         console.log(response.statusCode)

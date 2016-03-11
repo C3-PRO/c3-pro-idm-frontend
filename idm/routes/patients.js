@@ -1,14 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var service = require('../services/patients');
+var config = require('../utils.js');
 /* GET home page. */
-router.get('/', function(req, res, next) {
+
+router.get('/:page/:perpage', function(req, res, next) {
     var sess=req.session;
     console.log(sess.token);
     if (sess.username) {
         var opt = {
             "token": sess.token,
             "sess": sess,
+            "page": req.params.page,
+            "perpage": req.params.perpage,
             "res": res
         };
         service.getPatients(opt, function(data, opt){
@@ -34,6 +38,11 @@ router.get('/', function(req, res, next) {
     } else {
         res.redirect('/login');
     }
+});
+
+router.get('/', function(req, res, next) {
+    res.redirect('/patients/0/'+config.app.perpage);
+
 });
 
 module.exports = router;

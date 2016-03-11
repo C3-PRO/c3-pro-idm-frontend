@@ -12,8 +12,10 @@ block content
     p
         input.form-control(name="idef", type="text", value="#{patient.id}", style="visibility:hidden;")
     p
-        button(type="submit") Update
-        button(onclick="move();return false;") Cancel
+        button(type="submit")
+            i.fa.fa-save &nbsp;Update
+        button(onclick="move();return false;")
+            i.fa.fa-stop &nbsp;Cancel
 
     if !(typeof errMessage === 'undefined')
         p.errormsg= errMessage

@@ -18,8 +18,10 @@ block content
         p
             input.form-control(name="email", type="text", placeholder="johndoe@...", value="#{patient.email}" )
     p
-        button.btn.btn-lg.btn-primary.btn-block(type="submit") Add
-        button(onclick="move();return false;") Cancel
+        button.btn.btn-lg.btn-primary.btn-block(type="submit")
+            i.fa.fa-save &nbsp;Add
+        button(onclick="move();return false;")
+            i.fa.fa-stop &nbsp;Cancel
 
   if !(typeof errMessage === 'undefined')
     p.errormsg= errMessage
