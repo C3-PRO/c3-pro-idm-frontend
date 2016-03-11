@@ -134,9 +134,9 @@ if (app.get('env') === 'test') {
         var testPatients = require('./testPatients.json');
         var data = {
             statusCode: 200,
-            body:testPatients,
+            body:JSON.stringify(testPatients),
             error:''
-        }
+        };
         func(data, opt);
     }
 
@@ -144,23 +144,23 @@ if (app.get('env') === 'test') {
         var testPatient = require('./testPatient.json');
         var data = {
             statusCode: 200,
-            body:testPatient,
+            body:JSON.stringify(testPatient),
             error:''
-        }
+        };
         func(data, opt);
     }
 
     exports.newPatient = function (opt, patient, func) {
         var data = {
             statusCode: 201
-        }
+        };
         func(data, patient, opt);
     }
 
     exports.updatePatient = function (opt, patient, func) {
         var data = {
             statusCode: 201
-        }
+        };
         func(data, patient, opt);
     }
 }
