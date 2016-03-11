@@ -7,12 +7,14 @@ var config = require('../utils.js');
 router.get('/:page/:perpage', function(req, res, next) {
     var sess=req.session;
     console.log(sess.token);
+    req.query.state
     if (sess.username) {
         var opt = {
             "token": sess.token,
             "sess": sess,
             "page": req.params.page,
             "perpage": req.params.perpage,
+            "state": req.query.state,
             "res": res
         };
         service.getPatients(opt, function(data, opt){

@@ -48,10 +48,12 @@ block content
                     td
                         if patient.state.id==0
                             a(href='/mail/#{patient.id}')
-                                img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
+                                i.fa.fa-envelope
+                                //img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
                         if patient.state.id==1
                             a(href='/mail/#{patient.id}')
-                                img(src='/images/email_resend.png', title='Resend enrollment invitation', alt='Resend enrollment invitation', style='width: 35%;')
+                                i.fa.fa-envelope-o
+                                //img(src='/images/email_resend.png', title='Resend enrollment invitation', alt='Resend enrollment invitation', style='width: 35%;')
             else
                 - b=0
                 tr
@@ -74,10 +76,12 @@ block content
                     td
                         if patient.state.id==0
                             a(href='/mail/#{patient.id}')
-                                img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
+                                i.fa.fa-envelope
+                                //img(src='/images/email_send.png', title='Send enrollment invitation', alt='Send enrollment invitation', style='width: 35%;')
                         if patient.state.id==1
                             a(href='/mail/#{patient.id}')
-                                img(src='/images/email_resend.png', title='Resend enrollment invitation', alt='Resend enrollment invitation', style='width: 35%;')
+                                i.fa.fa-envelope-o
+                                //img(src='/images/email_resend.png', title='Resend enrollment invitation', alt='Resend enrollment invitation', style='width: 35%;')
         else
           li no patients
 
