@@ -15,20 +15,19 @@ router.get('/', function(req, res, next) {
 /* POST for log in*/
 
 router.post('/', function(req, res, next) {
-    console.log(req.body.username + ":" + req.body.password);
+    //console.log(req.body.username + ":" + req.body.password);
     var opt = {
         "key": req.body.username + ":" + req.body.password,
         "sess": req.session,
         "username": req.body.username,
         "res":res
     };
-    service.oauth(opt,function (username, token, sess) {
+    service.oauth(opt,function(username, token, sess) {
         sess.username = username;
         sess.token = token;
-        console.log(token);
+        console.log('OAuth2 token: ', token);
         res.redirect('/patients');
     });
-
 });
 
 module.exports = router;

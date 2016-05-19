@@ -1,5 +1,5 @@
 /*
- API wrapper to get entolled patients
+ API wrapper to get enrolled patients
  */
 var express = require('express');
 var request = require('request');
@@ -7,20 +7,25 @@ var config = require('../utils.js');
 var exports = module.exports = {};
 var app = express();
 
-exports.oauth = function (opt, func) {
+exports.oauth = function(opt, func) {
     var options = setBaseOptions(opt, config.oauth.endpoint+"?grant_type=client_credentials", 'POST');
-    console.log(options.uri);
-    request(options, function (error, response, body) {
-        console.log(response.statusCode)
-        if (response.statusCode == 401) {
+    console.log('OAuth2 request:  ', options.uri);
+    request(options, function(error, response, body) {
+        console.log('OAuth2 response: ', response ? response.statusCode : null);
+        if (!response) {
             opt.res.render('login', {
                 title: 'IDM',
-                errMessage:"Wrong credentials. Please, try again."
+                errmessage: "No response from authorization server, please contact an admin."
+            });
+        } else if (response.statusCode == 401) {
+            opt.res.render('login', {
+                title: 'IDM',
+                errMessage: "Wrong credentials. Please, try again."
             });
         } else if (response.statusCode >= 400) {
             opt.res.render('login', {
                 title: 'IDM',
-                errMessage:"HTTP error code:" + response.statusCode
+                errMessage: "HTTP error code:" + response.statusCode
             });
         } else {
             var resp = JSON.parse( body );
