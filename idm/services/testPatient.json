@@ -1,11 +1,11 @@
 {
-"patient":
-  {
-  "id": "123456",
-  "email": "johndoe@johndoe.com",
-  "sssid": "sssid1",
-  "creationDate":14484684780,
-  "changeStateDate": 14484684780,
-  "state": {"id": 0, "state":"Enrolled"}
-  }
+	"id": "123456",
+	"email": "johndoe@johndoe.com",
+	"sssid": "sssid1",
+	"creationDate": 14484684780,
+	"changeStateDate": 14484684780,
+	"state": {
+		"id": 0,
+		"state": "Enrolled"
+	}
 }

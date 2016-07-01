@@ -1,7 +1,7 @@
 
 
 /*
-API wrapper to get entolled patients
+API wrapper to get enrolled patients
  */
 var express = require('express');
 var request = require('request');
@@ -19,23 +19,18 @@ exports.getPatients = function (opt, func) {
     var options = setBaseOptions(opt, fullEndPoint, 'GET');
 
     request(options, function (error, response, body) {
-        console.log(response.statusCode)
-        data = {
+        var data = {
             statusCode: response.statusCode,
-            body: body,
-            error: error
         };
-        if (data.statusCode == 401) {
-            opt.sess.destroy(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    opt.res.redirect('/');
-                }
-            });
-        } else {
-            func(data, opt);
+        if (response.statusCode < 400) {
+            var patients = JSON.parse(data.body);
+            // TODO: prepare data for mustache
+            data.body = patients.patients;
         }
+        else {
+            data.error = error;
+        }
+        func(data, opt);
     });
 }
 
@@ -86,7 +81,6 @@ exports.newPatient = function (opt, patient, func) {
         } else {
             func(data,patient, opt);
         }
-
     });
 }
 
@@ -138,8 +132,7 @@ if (app.get('env') === 'test') {
         var testPatients = require('./testPatients.json');
         var data = {
             statusCode: 200,
-            body:JSON.stringify(testPatients),
-            error:''
+            body: testPatients.patients,
         };
         func(data, opt);
     }
@@ -148,22 +141,21 @@ if (app.get('env') === 'test') {
         var testPatient = require('./testPatient.json');
         var data = {
             statusCode: 200,
-            body:JSON.stringify(testPatient),
-            error:''
+            body: testPatient,
         };
         func(data, opt);
     }
 
     exports.newPatient = function (opt, patient, func) {
         var data = {
-            statusCode: 201
+            statusCode: 201,
         };
         func(data, patient, opt);
     }
 
     exports.updatePatient = function (opt, patient, func) {
         var data = {
-            statusCode: 201
+            statusCode: 201,
         };
         func(data, patient, opt);
     }
