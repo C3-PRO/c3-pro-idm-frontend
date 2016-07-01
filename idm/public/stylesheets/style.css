@@ -241,7 +241,7 @@ striping:
 .pure-table th {
 	background-color: transparent;
 }
-.pure-table-odd td {
+.pure-table tr:nth-child(odd) td {
 	background-color: #f2f2f2;
 }
 

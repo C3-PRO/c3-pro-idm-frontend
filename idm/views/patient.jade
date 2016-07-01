@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  h2 Update subject information
+  form(action="/patient", method="POST")
+    p SSSID:
+    p
+      input.form-control(name="sssid", type="text", placeholder="1234...", value='#{patient.sssid}')
+    p eMail:
+    p
+      input.form-control(name="email", type="text", placeholder="johndoe@...", value='#{patient.email}')
+    p
+      input.form-control(name="idef", type="text", value="#{patient.id}", style="visibility:hidden;")
+    p
+      button(type="submit")
+        i.fa.fa-save &nbsp;Update
+      button(onclick="move();return false;")
+        i.fa.fa-stop &nbsp;Cancel
+
+    if !(typeof errMessage === 'undefined')
+      p.errormsg= errMessage
+
+    script.
+      function move() {
+        window.location.href = '/patients'
+      }

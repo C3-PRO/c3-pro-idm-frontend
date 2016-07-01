@@ -32,7 +32,7 @@ router.get('/:id', function(req, res, next) {
                 };
                 opt.res.render('error', x);
             } else {
-                opt.res.render('subject', JSON.parse(data.body));
+                opt.res.render('patient', JSON.parse(data.body));
             }
         });
     } else {
@@ -44,7 +44,7 @@ router.get('/:id', function(req, res, next) {
 router.get('/', function(req, res, next) {
     var sess=req.session;
     if (sess.username) {
-        res.render('subjectNew');
+        res.render('patientNew');
     } else {
         res.redirect('/login');
     }
@@ -86,14 +86,14 @@ function updatePatient(req,res) {
         if (data.statusCode == 400) {
             /* Validation problem. So, we render the same that we had, showing an error message */
             var resp = JSON.parse( data.body );
-            opt.res.render('subject', {
+            opt.res.render('patient', {
                 "patient": patient.patient,
                 "errMessage": resp.error
             });
         }
 
         else if (data.statusCode > 400) {
-            opt.res.render('subject', {
+            opt.res.render('patient', {
                 "patient": patient.patient,
                 "errMessage": data.statusCode
             });
@@ -124,14 +124,14 @@ function newPatient(req,res) {
         if (data.statusCode == 400) {
             /* Validation problem. So, we render the same that we had, showing an error message */
             var resp = JSON.parse( data.body );
-            opt.res.render('subjectNew', {
+            opt.res.render('patientNew', {
                 "patient": patient.patient,
                 "errMessage": resp.error
             });
         }
 
         else if (data.statusCode > 400) {
-            opt.res.render('subject', {
+            opt.res.render('patient', {
                 "patient": patient.patient,
                 "errMessage": data.statusCode
             });

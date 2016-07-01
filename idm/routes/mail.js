@@ -41,7 +41,7 @@ router.get('/:id', function(req, res, next) {
                         };
                         opt.res.render('error', x);
                     } else {
-                        opt.res.render('subjects', {
+                        opt.res.render('patients', {
                             "patients": JSON.parse(data.body).patients,
                             "errMessage": "Error sending the Invitation mail" + errmsg
                         });
@@ -66,7 +66,7 @@ router.get('/:id', function(req, res, next) {
                         };
                         opt.res.render('error', x);
                     } else {
-                        opt.res.render('subjects', {
+                        opt.res.render('patients', {
                             "patients": JSON.parse(data.body).patients,
                             "okMessage": "Invitation mail sent successfully"
                         });
