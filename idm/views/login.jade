@@ -4,12 +4,12 @@ block content
   h2 IDM Log in
   form(action="/login", method="POST")
     p
-        input.form-control(name="username", type="text", placeholder="ch...")
+      input.form-control(name="username", type="text", value=username, placeholder="ch...")
     p
-        input.form-control(name="password", type="password", placeholder="***")
+      input.form-control(name="password", type="password", placeholder="***")
     p
-        button(type="submit")
-            i.fa.fa-sign-in &nbsp;Log in
+      button(type="submit")
+        i.fa.fa-sign-in &nbsp;Log in
 
-  if !(typeof errMessage === 'undefined')
-    p.errormsg= errMessage
+  if !(typeof errmessage === 'undefined')
+    p.errormsg= errmessage

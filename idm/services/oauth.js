@@ -20,12 +20,12 @@ exports.oauth = function(opt, func) {
         } else if (response.statusCode == 401) {
             opt.res.render('login', {
                 title: 'IDM',
-                errMessage: "Wrong credentials. Please, try again."
+                errmessage: "Wrong credentials. Please, try again."
             });
         } else if (response.statusCode >= 400) {
             opt.res.render('login', {
                 title: 'IDM',
-                errMessage: "HTTP error code:" + response.statusCode
+                errmessage: "HTTP error code:" + response.statusCode
             });
         } else {
             var resp = JSON.parse( body );
@@ -35,7 +35,7 @@ exports.oauth = function(opt, func) {
 }
 
 function setBaseOptions(opt, endpoint, method) {
-    var key = new Buffer(opt.key).toString('base64');
+    var key = new Buffer(opt.username + ':' + opt.password).toString('base64');
     var options = {
         uri: config.oauth.protocol + "://" + config.oauth.host + ":" + config.oauth.port + endpoint,
         method : method,
@@ -47,7 +47,6 @@ function setBaseOptions(opt, endpoint, method) {
 }
 
 /* For testing purposes only */
-
 if (app.get('env') === 'test') {
     exports.oauth = function (opt, func) {
         func(opt.username, "aVeryRandomTestToken", opt.sess);

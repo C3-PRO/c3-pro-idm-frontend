@@ -85,7 +85,7 @@ exports.newPatient = function (opt, patient, func) {
 }
 
 exports.updatePatient = function (opt, patient, func) {
-    var options = setBaseOptions(opt, config.patient.endpoint+"/"+patient.patient.id, 'PUT');
+    var options = setBaseOptions(opt, config.patient.endpoint + '/' + patient.patient.id, 'PUT');
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(patient);
     request(options, function (error, response, body) {
@@ -115,7 +115,7 @@ function setBaseOptions(opt, endpoint, method) {
         uri: config.patients.protocol + "://" + config.patients.host + ":" + config.patients.port + endpoint,
         method : method,
         headers: {
-            'Authorization': 'Bearer ' + opt.token
+            'Authorization': config.patients.token_type + ' ' + opt.token,
         }
     }
     return options;

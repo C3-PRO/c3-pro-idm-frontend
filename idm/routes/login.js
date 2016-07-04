@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var service = require('../services/oauth');
+//var service = require('../services/oauth');
+var service = require('../services/jwt');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -13,19 +14,19 @@ router.get('/', function(req, res, next) {
 });
 
 /* POST for log in*/
-
 router.post('/', function(req, res, next) {
-    //console.log(req.body.username + ":" + req.body.password);
     var opt = {
-        "key": req.body.username + ":" + req.body.password,
-        "sess": req.session,
         "username": req.body.username,
-        "res":res
+        "password": req.body.password,
+        "sess": req.session,
+        "res": res,
     };
-    service.oauth(opt,function(username, token, sess) {
+    // TODO: check config to decide between OAuth2 or JWT
+    //service.oauth(opt, function(username, token, sess) {
+    service.jwt(opt, function(username, token, sess) {
         sess.username = username;
         sess.token = token;
-        console.log('OAuth2 token: ', token);
+        console.log('token: ', token);
         res.redirect('/patients');
     });
 });
