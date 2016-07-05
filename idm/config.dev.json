@@ -9,7 +9,7 @@
     "host":"127.0.0.1",
     "port":9096,
     "protocol":"http",
-    "endpoint":"/c3pro-idm-service/rest/patientapi/patient",
+    "endpoint":"/patients",
     "token_type": "JWT"
   },
   "patient":
@@ -17,7 +17,7 @@
     "host":"127.0.0.1",
     "port":9096,
     "protocol":"http",
-    "endpoint":"/c3pro-idm-service/rest/patientapi/patient"
+    "endpoint":"/patients"
   },
   "oauth": {
     "host": "127.0.0.1",
@@ -27,7 +27,7 @@
   },
   "jwt": {
     "host": "127.0.0.1",
-    "port": 8080,
+    "port": 9096,
     "protocol": "http",
     "endpoint": "/auth"
   },

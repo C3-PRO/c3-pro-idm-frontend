@@ -29,7 +29,7 @@ router.get('/api/:page/:perpage', function(req, res, next) {
                 }
                 if (!data.error) {
                     data.error = {
-                        'message': "HTTP Error getting patients lists"
+                        'message': "error getting patients",
                     };
                 }
                 data.error.status = data.statusCode;
