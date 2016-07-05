@@ -2,10 +2,7 @@
 	"id": "123456",
 	"email": "johndoe@johndoe.com",
 	"sssid": "sssid1",
-	"creationDate": 14484684780,
-	"changeStateDate": 14484684780,
-	"state": {
-		"id": 0,
-		"state": "Enrolled"
-	}
+	"created": 14484681780,
+	"changed": 14484684780,
+	"status": 0
 }

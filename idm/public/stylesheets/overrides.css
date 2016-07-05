@@ -1,0 +1,33 @@
+
+.pure-table .patient_name {
+	font-weight: bold;
+}
+
+.pure-table .patient_name {
+	font-weight: bold;
+}
+.pure-table td.sssid,
+.pure-table td.action {
+	font-size: 1.5em;
+	text-align: center; vertical-align: middle;
+}
+
+.pure-table td.patient_status {
+	text-align: center; vertical-align: middle;
+}
+.pure-table td.patient_status > div {
+	display: inline-block;
+	width: 1em; height: 1em;
+	font-size: 0.8em; line-height: 1.5;
+	border-radius: 100%;
+	background-color: rgb(220,220,220);
+}
+.status0 {
+	background-color: #900 !important;
+}
+.status1 {
+	background-color: #F90 !important;
+}
+.status2 {
+	background-color: #390 !important;
+}

@@ -12,7 +12,7 @@ router.get('/api/:page/:perpage', function(req, res, next) {
             sess: sess,
             page: req.params.page,
             perpage: req.params.perpage,
-            state: req.query.state,
+            status: req.query.status,
             res: res,
         };
         service.getPatients(opt, function(data, opt) {

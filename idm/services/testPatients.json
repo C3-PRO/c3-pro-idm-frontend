@@ -1,45 +1,44 @@
 {
-  "patients":
-  [
+  "patients": [
     {
       "id": "123456",
       "email": "johndoe@johndoe.com",
       "sssid": "sssid1",
-      "creationDate":14484684780,
-      "changeStateDate": 14484684780,
-      "state": {"id": 0, "state":"Pending eMail"}
+      "created": 14484684780,
+      "changed": null,
+      "status": 0
     },
     {
       "id": "123457",
       "email": "alice@alicedoe.com",
       "sssid": "sssid2",
-      "creationDate":14484684780,
-      "changeStateDate": 14484684780,
-      "state": {"id": 0, "state":"Pending eMail"}
+      "created": 14484681780,
+      "changed": 14484684780,
+      "status": 0
     },
     {
       "id": "123458",
       "email": "bob@bobdoe.com",
       "sssid": "sssid3",
-      "creationDate":14484684780,
-      "changeStateDate": 14484684780,
-      "state": {"id": 1, "state":"EMail Sent"}
+      "created": 14484684780,
+      "changed": null,
+      "status": 1
     },
     {
       "id": "123459",
       "email": "carol@carol.com",
       "sssid": "sssid4",
-      "creationDate":14484684780,
-      "changeStateDate": 14484684780,
-      "state": {"id": 1, "state":"EMail Sent"}
+      "created": 14484684780,
+      "changed": null,
+      "status": 1
     },
     {
       "id": "123460",
       "email": "dave@davedoe.com",
       "sssid": "sssid5",
-      "creationDate":14484684780,
-      "changeStateDate": 14484684780,
-      "state": {"id": 2, "state":"Enrolled"}
+      "created": 14484684780,
+      "changed": null,
+      "status": 2
     }
   ]
 }

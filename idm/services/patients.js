@@ -13,19 +13,23 @@ var app = express();
 exports.getPatients = function (opt, func) {
     var patientId = opt.patientId;
     var fullEndPoint = config.patients.endpoint + '?page='+opt.page+'&perpage='+opt.perpage;
-    if (typeof opt.state != 'undefined') {
-        fullEndPoint = fullEndPoint + '&state=' + opt.state;
+    if (typeof opt.status != 'undefined') {
+        fullEndPoint = fullEndPoint + '&status=' + opt.status;
     }
     var options = setBaseOptions(opt, fullEndPoint, 'GET');
-
+    
     request(options, function (error, response, body) {
         var data = {
             statusCode: response.statusCode,
         };
         if (response.statusCode < 400) {
-            var patients = JSON.parse(data.body);
-            // TODO: prepare data for mustache
-            data.body = patients.patients;
+            var res = JSON.parse(body);
+            var patients = res.data || res.patients;
+            for (var i = 0; i < patients.length; i++) {
+                setPatientStatusString(patients[i]);
+                formatPatientDates(patients[i]);
+            }
+            data.body = patients;
         }
         else {
             data.error = error;
@@ -121,12 +125,49 @@ function setBaseOptions(opt, endpoint, method) {
     return options;
 }
 
+function setPatientStatusString(patient) {
+    if (!patient.status) {
+        patient.status = 0;
+    }
+    if (1 == patient.status) {
+        patient.human_status = "Invited";
+    }
+    else if (2 == patient.status) {
+        patient.human_status = "Enrolled";
+    }
+    else if (3 == patient.status) {
+        patient.human_status = "Withdrawn";
+    }
+    else {
+        patient.human_status = "Pending";
+    }
+}
+
+function formatPatientDates(patient) {
+    if (patient.created) {
+        patient.createdDate = niceDate(patient.created);
+    }
+    if (patient.changed) {
+        patient.changedDate = niceDate(patient.changed);
+    }
+}
+
+function niceDate(epoch) {
+    var date = new Date(epoch*1000);
+    var today = new Date();
+    var time = date.getHours() + ':' + date.getMinutes();
+    if (date.setHours(0,0,0,0) == today.setHours(0,0,0,0)) {
+        return "Today, " + time;
+    }
+    return date.toLocaleDateString() + ', ' + time
+}
+
 
 /*********************
  Testing purposes only
  ********************/
 
-if (app.get('env') === 'test') {
+if (app.get('env') === 'testDISABLED') {
     var exports = module.exports = {};
     exports.getPatients = function (opt, func) {
         var testPatients = require('./testPatients.json');

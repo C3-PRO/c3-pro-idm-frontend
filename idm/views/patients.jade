@@ -5,23 +5,17 @@ block content
     function move(id) {
       window.location.href = '/patient/'+ id
     }
-
-    function convert (epoch) {
-      var date = new Date(epoch);
-      return (date.getMonth()+1) + "/" + date.getDate() +  "/" + date.getFullYear() ;
-    }
-
+  
   .center
   table.pure-table
     thead
       tr
-        th #
+        th 
         th SSSID
-        th eMail
-        th State
-        th Creation
-        th Change State
-        th Actions
+        th Participant
+        th Created
+        th Changed
+        th 
 
     tbody#patients
       tr
@@ -30,13 +24,20 @@ block content
 
   script(id='tmpl_row', type='x-tmpl-mustache').
     <tr>
-      <td><img src="/images/state{{ state.id }}.png" alt="state {{ state.id }}"></td>
-      <td>{{ sssid }}</td>
-      <td>{{ email }}</td>
-      <td>{{ state.state }}</td>
-      <td>{{ creationDate }}</td>
-      <td>{{ changeStateDue }}</td>
-      <td><a href="/mail/\#{{ id }}"><i class="fa fa-envelope{{#state.id}}-o{{/state.id}}"></i></a></td>
+      <td class="patient_status">
+        <div class="status{{ status }}"></div><br>
+        {{ human_status }}
+      </td>
+      <td class="sssid">{{ sssid }}</td>
+      <td>
+        <div class="patient_name">{{ name }}</div>
+        {{#email}}<a class="patient_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
+      </td>
+      <td>{{ createdDate }}</td>
+      <td>{{ changedDate }}</td>
+      <td class="action">
+        <a href="/mail/\#{{ sssid }}"><i class="fa fa-envelope{{#status}}-o{{/status}}"></i></a>
+      </td>
     </tr>
 
 block scripts
