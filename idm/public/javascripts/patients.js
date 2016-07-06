@@ -14,7 +14,7 @@ function getPatients(searchstring, start, batch) {
 		},
 		function(error) {
 			if (error && 'status' in error && 401 == error.status) {
-				provokeLogin();
+				provokeLogin('/patients');
 			}
 		}
 	);

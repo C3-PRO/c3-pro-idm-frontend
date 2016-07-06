@@ -1,12 +1,13 @@
 extends layoutout
 
 block content
-  h2 IDM Log in
+  h2= title
   form(action="/login", method="POST")
+    input.form-control(name="destination", type="hidden", value=destination)
     p
-      input.form-control(name="username", type="text", value=username, placeholder="ch...")
+      input.form-control(name="username", type="text", value=username, placeholder="your email address")
     p
-      input.form-control(name="password", type="password", placeholder="***")
+      input.form-control(name="password", type="password", placeholder="password")
     p
       button(type="submit")
         i.fa.fa-sign-in &nbsp;Log in

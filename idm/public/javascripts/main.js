@@ -6,6 +6,8 @@
 /**
  *  Redirect to login.
  */
-function provokeLogin() {
-	alert("Please re-authorize");
+function provokeLogin(destination) {
+	if (document.location.href != '/login') {
+		document.location.href = '/login' + (destination ? '?dest='+destination : '');
+	}
 }

@@ -1,6 +1,14 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  h1= errorMessage
+  h2= status
+  if (destination)
+    script.
+      function back() {
+        window.location.href = '#{destination}'
+      }
+    button(onclick="back();return false;")
+      i.fa.fa-arrow-left &nbsp;Go back
+  
+  pre #{errorStack}

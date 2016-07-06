@@ -1,6 +1,7 @@
 {
   "app":
   {
+    "login_title":"IDM Login",
     "support":"pascal.pfiffner@childrens.harvard.edu",
     "perpage":5
   },

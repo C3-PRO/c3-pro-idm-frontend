@@ -1,11 +1,6 @@
 extends layout
 
 block content
-  script.
-    function move(id) {
-      window.location.href = '/patient/'+ id
-    }
-  
   .center
   table.pure-table
     thead
@@ -15,6 +10,7 @@ block content
         th Participant
         th Created
         th Changed
+        th 
         th 
 
     tbody#patients
@@ -37,6 +33,9 @@ block content
       <td>{{ changedDate }}</td>
       <td class="action">
         <a href="/mail/\#{{ sssid }}"><i class="fa fa-envelope{{#status}}-o{{/status}}"></i></a>
+      </td>
+      <td class="action">
+        <a href="/patients/{{ sssid }}"><i class="fa fa-arrow-circle-right"></i></a>
       </td>
     </tr>
 

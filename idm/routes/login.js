@@ -1,15 +1,17 @@
 var express = require('express');
 var router = express.Router();
+var config = require('../utils.js');
 //var service = require('../services/oauth');
 var service = require('../services/jwt');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    var sess=req.session;
-    if (sess.username) {
+    if (req.session.token) {
         res.redirect('/patients');
-    } else {
-        res.render('login', {title: 'IDM'});
+    }
+    else {
+        var title = (config.app && config.app.login_title) ? config.app.login_title : 'IDM Login';
+        res.render('login', {title: title, destination: req.query.dest});
     }
 });
 
@@ -27,7 +29,7 @@ router.post('/', function(req, res, next) {
         sess.username = username;
         sess.token = token;
         console.log('token: ', token);
-        res.redirect('/patients');
+        res.redirect(req.body.destination ? req.body.destination : '/patients');
     });
 });
 

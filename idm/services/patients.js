@@ -11,7 +11,7 @@ var config = require('../utils.js');
 var exports = module.exports = {};
 var app = express();
 
-exports.getPatients = function (opt, func) {
+exports.getPatients = function(opt, func) {
     var patientId = opt.patientId;
     var fullEndPoint = config.patients.endpoint + '?page='+opt.page+'&perpage='+opt.perpage;
     if (typeof opt.status != 'undefined') {
@@ -19,31 +19,35 @@ exports.getPatients = function (opt, func) {
     }
     var options = setBaseOptions(opt, fullEndPoint, 'GET');
     
-    request(options, function (error, response, body) {
-        var data = {
-            statusCode: response.statusCode,
-        };
-        if (response.statusCode < 400) {
-            var res = JSON.parse(body);
-            var patients = res.data || res.patients;
+    request(options, function(error, response, body) {
+        var data = dataOnJSONResponse(error, response, body, function(parsed) {
+            var patients = parsed.data || parsed.patients;
             for (var i = 0; i < patients.length; i++) {
-                setPatientStatusString(patients[i]);
-                formatPatientDates(patients[i]);
+                manipulatePatientData(patients[i]);
             }
-            data.body = patients;
-        }
-        else {
-            data.error = error;
-        }
+            return patients;
+        });
         func(data, opt);
     });
 }
 
-exports.getPatient = function (opt, func) {
-    var patientId = opt.patientId;
-    var options = setBaseOptions(opt, config.patients.endpoint+'/'+patientId, 'GET');
+exports.getPatient = function(opt, func) {
+    var options = setBaseOptions(opt, config.patients.endpoint+'/'+opt.patientId, 'GET');
+    request(options, function(error, response, body) {
+        var data = dataOnJSONResponse(error, response, body, function(parsed) {
+            var patient = parsed.data || parsed.patient;
+            manipulatePatientData(patient);
+            return patient;
+        });
+        func(data, opt);
+    });
+}
 
-    request(options, function (error, response, body) {
+/*exports.newPatient = function(opt, patient, func) {
+    var options = setBaseOptions(opt, config.patient.endpoint, 'POST');
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify({data: patient});
+    request(options, function(error, response, body) {
         console.log(response.statusCode)
         data = {
             statusCode: response.statusCode,
@@ -51,66 +55,22 @@ exports.getPatient = function (opt, func) {
             error: error
         };
         if (data.statusCode == 401) {
-            opt.sess.destroy(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    opt.res.redirect('/');
-                }
-            });
+            forceLogin(opt.sess, opt.res);
         } else {
             func(data, opt);
         }
     });
-}
+}   //  */
 
-exports.newPatient = function (opt, patient, func) {
-    var options = setBaseOptions(opt, config.patient.endpoint, 'POST');
+exports.updatePatient = function(opt, patient, func) {
+    var options = setBaseOptions(opt, config.patients.endpoint+'/'+opt.patientId, 'PUT');
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(patient);
-    request(options, function (error, response, body) {
-        console.log(response.statusCode)
-        data = {
-            statusCode: parseInt(response.statusCode,10),
-            body: body,
-            error: error
-        };
-        if (data.statusCode == 401) {
-            opt.sess.destroy(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    opt.res.redirect('/');
-                }
-            });
-        } else {
-            func(data,patient, opt);
-        }
-    });
-}
-
-exports.updatePatient = function (opt, patient, func) {
-    var options = setBaseOptions(opt, config.patient.endpoint + '/' + patient.patient.id, 'PUT');
-    options.headers["Content-Type"] = "application/json";
-    options.body = JSON.stringify(patient);
-    request(options, function (error, response, body) {
-        console.log(response.statusCode)
-        data = {
-            statusCode: parseInt(response.statusCode, 10),
-            body: body,
-            error: error
-        };
-        if (data.statusCode == 401) {
-            opt.sess.destroy(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    opt.res.redirect('/');
-                }
-            });
-        } else {
-            func(data,patient, opt);
-        }
+    
+    request(options, function(error, response, body) {
+        //console.log('services/patients/updatePatient:', body);
+        var data = dataOnJSONResponse(error, response, body);
+        func(data, opt);
     });
 
 }
@@ -126,8 +86,27 @@ function setBaseOptions(opt, endpoint, method) {
     return options;
 }
 
+function dataOnJSONResponse(error, response, body, manipulateFuncOnSuccess) {
+    var data = {
+        statusCode: response.statusCode,
+    };
+    var parsed = body ? JSON.parse(body) : {};
+    if (response.statusCode < 400) {
+        data.body = manipulateFuncOnSuccess ? manipulateFuncOnSuccess(parsed) : parsed;
+    }
+    else {
+        data.error = (parsed.error && parsed.error.message) ? parsed.error.message : error;
+    }
+    return data;
+}
+
+function manipulatePatientData(patient) {
+    setPatientStatusString(patient);
+    formatPatientDates(patient);
+}
+
 function setPatientStatusString(patient) {
-    if (!patient.status) {
+    if (undefined === patient.status) {
         patient.status = 0;
     }
     if (1 == patient.status) {
@@ -160,16 +139,19 @@ function formatPatientDates(patient) {
 
 if (app.get('env') === 'testDISABLED') {
     var exports = module.exports = {};
-    exports.getPatients = function (opt, func) {
-        var testPatients = require('./testPatients.json');
+    exports.getPatients = function(opt, func) {
+        var patients = require('./testPatients.json').patients;
+        for (var i = 0; i < patients.length; i++) {
+            manipulatePatientData(patients[i]);
+        }
         var data = {
             statusCode: 200,
-            body: testPatients.patients,
+            body: patients,
         };
         func(data, opt);
     }
 
-    exports.getPatient = function (opt, func) {
+    exports.getPatient = function(opt, func) {
         var testPatient = require('./testPatient.json');
         var data = {
             statusCode: 200,
@@ -178,14 +160,14 @@ if (app.get('env') === 'testDISABLED') {
         func(data, opt);
     }
 
-    exports.newPatient = function (opt, patient, func) {
+    exports.newPatient = function(opt, patient, func) {
         var data = {
             statusCode: 201,
         };
         func(data, patient, opt);
     }
 
-    exports.updatePatient = function (opt, patient, func) {
+    exports.updatePatient = function(opt, patient, func) {
         var data = {
             statusCode: 201,
         };
