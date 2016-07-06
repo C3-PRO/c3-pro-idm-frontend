@@ -22,12 +22,12 @@
 	border-radius: 100%;
 	background-color: rgb(220,220,220);
 }
-.status0 {
-	background-color: #900 !important;
-}
 .status1 {
 	background-color: #F90 !important;
 }
 .status2 {
 	background-color: #390 !important;
+}
+.status3 {
+	background-color: #900 !important;
 }

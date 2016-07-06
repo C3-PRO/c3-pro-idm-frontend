@@ -6,6 +6,7 @@ API wrapper to get enrolled patients
 var express = require('express');
 var request = require('request');
 var async = require('async');
+var moment = require('moment');
 var config = require('../utils.js');
 var exports = module.exports = {};
 var app = express();
@@ -145,21 +146,11 @@ function setPatientStatusString(patient) {
 
 function formatPatientDates(patient) {
     if (patient.created) {
-        patient.createdDate = niceDate(patient.created);
+        patient.createdDate = moment(patient.created * 1000).calendar();
     }
     if (patient.changed) {
-        patient.changedDate = niceDate(patient.changed);
+        patient.changedDate = moment(patient.changed * 1000).calendar();
     }
-}
-
-function niceDate(epoch) {
-    var date = new Date(epoch*1000);
-    var today = new Date();
-    var time = date.getHours() + ':' + date.getMinutes();
-    if (date.setHours(0,0,0,0) == today.setHours(0,0,0,0)) {
-        return "Today, " + time;
-    }
-    return date.toLocaleDateString() + ', ' + time
 }
 
 
