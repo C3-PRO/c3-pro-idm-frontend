@@ -43,24 +43,18 @@ exports.getPatient = function(opt, func) {
     });
 }
 
-/*exports.newPatient = function(opt, patient, func) {
-    var options = setBaseOptions(opt, config.patient.endpoint, 'POST');
+exports.newPatient = function(opt, patient, func) {
+    var options = setBaseOptions(opt, config.patients.endpoint+'/', 'POST');
     options.headers["Content-Type"] = "application/json";
-    options.body = JSON.stringify({data: patient});
+    options.body = JSON.stringify(patient);
+    //console.log('-->', options.body);
+    
     request(options, function(error, response, body) {
-        console.log(response.statusCode)
-        data = {
-            statusCode: response.statusCode,
-            body: body,
-            error: error
-        };
-        if (data.statusCode == 401) {
-            forceLogin(opt.sess, opt.res);
-        } else {
-            func(data, opt);
-        }
+        console.log('services/patients/newPatient:', body);
+        var data = dataOnJSONResponse(error, response, body);
+        func(data, opt);
     });
-}   //  */
+}
 
 exports.updatePatient = function(opt, patient, func) {
     var options = setBaseOptions(opt, config.patients.endpoint+'/'+opt.patientId, 'PUT');

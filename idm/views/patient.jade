@@ -2,8 +2,12 @@ extends layout
 
 block content
   div.patient
-    h2 Update Subject Information
-    form(action="/patients/#{patient.sssid}", method="POST")
+    if (patientId == 0)
+      h2 New Subject
+    else
+      h2 Update Subject Information
+    form(action="/patients/#{patientId}", method="POST")
+    
       p SSSID:
       p
         input.form-control(name="sssid", type="text", value=patient.sssid)
@@ -16,14 +20,17 @@ block content
         input.form-control(name="email", type="text", value=patient.email)
       p
         button(type="submit")
-          i.fa.fa-save &nbsp;Update
-        button(onclick="move();return false;")
+          if (patientId == 0)
+            i.fa.fa-save &nbsp;Create
+          else
+            i.fa.fa-save &nbsp;Update
+        button(onclick="cancel();return false;")
           i.fa.fa-stop &nbsp;Cancel
 
       if !(typeof errorMessage === 'undefined')
         p.errormsg= errorMessage
 
       script.
-        function move() {
+        function cancel() {
           window.location.href = '/patients'
         }

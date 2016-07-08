@@ -54,9 +54,12 @@ router.get('/:id', function(req, res, next) {
             sess: sess,
             res: res,
         };
-        service.getPatient(opt, function (data, opt) {
+        var callback = function (data, opt) {
             if (data.body) {
-                opt.res.render('patient', {patient: data.body});
+                opt.res.render('patient', {
+                    patientId: opt.patientId,
+                    patient: data.body,
+                });
             }
             else if (data.statusCode == 401) {
                 forceLogin(opt.sess, opt.res, '/patients/'+req.params.id);
@@ -69,7 +72,15 @@ router.get('/:id', function(req, res, next) {
                     destination: '/patients',
                 });
             }
-        });
+        };
+        
+        // we use "0" to indicate that we want to create a new patient
+        if (req.params.id > 0) {
+            service.getPatient(opt, callback);
+        }
+        else {
+            callback({body: {}}, opt);
+        }
     }
     else {
         res.redirect('/login?dest=/patients/'+req.params.id);
@@ -94,11 +105,11 @@ router.post('/:id', function(req, res, next) {
             sess: req.session,
             res: res,
         };
-        service.updatePatient(opt, patient, function(data, opt) {
-            console.log('routes/patients/updatePatient:', data);
+        var callback = function(data, opt) {
+            console.log('routes/patients/(update|new)Patient:', data);
             if (data.body) {
                 opt.res.render('msg', {
-                    "message": "Updated successfully",
+                    "message": (opt.patientId == 0) ? "Subject Created" : "Data Updated",
                     "okref": "/patients"
                 })
             }
@@ -107,11 +118,20 @@ router.post('/:id', function(req, res, next) {
             }
             else {    // Validation problem, render what we had plus an error message
                 opt.res.render('patient', {
+                    patientId: opt.patientId,
                     patient: patient,
-                    errorMessage: data.error || "Failed to update patient, please try again",
+                    errorMessage: data.error || "Failed to store data, please try again",
                 });
             }
-        });
+        };
+        
+        // again, patient id of "0" means new patient
+        if (opt.patientId > 0) {
+            service.updatePatient(opt, patient, callback);
+        }
+        else {
+            service.newPatient(opt, patient, callback);
+        }
     }
     else {
         res.redirect('/login?dest=/patients/'+req.params.id);
