@@ -7,7 +7,7 @@ var service = require('../services/jwt');
 /* GET home page. */
 router.get('/', function(req, res, next) {
     if (req.session.token) {
-        res.redirect('/patients');
+        res.redirect('/subjects');
     }
     else {
         var title = (config.app && config.app.login_title) ? config.app.login_title : 'IDM Login';
@@ -29,7 +29,7 @@ router.post('/', function(req, res, next) {
         sess.username = username;
         sess.token = token;
         console.log('token: ', token);
-        res.redirect(req.body.destination ? req.body.destination : '/patients');
+        res.redirect(req.body.destination ? req.body.destination : '/subjects');
     });
 });
 

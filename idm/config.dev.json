@@ -1,14 +1,14 @@
 {
   "app": {
-    "login_title":"IDM Login",
-    "support":"pascal.pfiffner@childrens.harvard.edu",
-    "perpage":5
+    "login_title": "IDM Login",
+    "support": "pascal.pfiffner@childrens.harvard.edu",
+    "perpage": 5
   },
-  "patients": {
-    "host":"127.0.0.1",
-    "port":9096,
-    "protocol":"http",
-    "endpoint":"/patients",
+  "subjects": {
+    "host": "127.0.0.1",
+    "port": 9096,
+    "protocol": "http",
+    "endpoint": "/subject",
     "token_type": "JWT"
   },
   "oauth": {

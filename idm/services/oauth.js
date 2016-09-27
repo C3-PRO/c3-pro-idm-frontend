@@ -1,5 +1,5 @@
 /*
- API wrapper to get enrolled patients
+ API wrapper to get enrolled subjects
  */
 var express = require('express');
 var request = require('request');

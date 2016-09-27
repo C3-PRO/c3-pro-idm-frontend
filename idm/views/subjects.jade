@@ -13,21 +13,21 @@ block content
         th 
         th 
 
-    tbody#patients
+    tbody#subjects
       tr
         td(colspan='7')
-          p loading patients...
+          p loading subjects...
 
   script(id='tmpl_row', type='x-tmpl-mustache').
     <tr>
-      <td class="patient_status">
+      <td class="subject_status">
         <div class="status{{ status }}"></div><br>
         {{ human_status }}
       </td>
       <td class="sssid">{{ sssid }}</td>
       <td>
-        <div class="patient_name">{{ name }}</div>
-        {{#email}}<a class="patient_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
+        <div class="subject_name">{{ name }}</div>
+        {{#email}}<a class="subject_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
       </td>
       <td>{{ createdDate }}</td>
       <td>{{ changedDate }}</td>
@@ -35,13 +35,13 @@ block content
         <a href="/mail/\#{{ sssid }}"><i class="fa fa-envelope{{#status}}-o{{/status}}"></i></a>
       </td>
       <td class="action">
-        <a href="/patients/{{ sssid }}"><i class="fa fa-arrow-circle-right"></i></a>
+        <a href="/subjects/{{ sssid }}"><i class="fa fa-arrow-circle-right"></i></a>
       </td>
     </tr>
 
 block scripts
-  script(src="/javascripts/patients.js")
+  script(src="/javascripts/subjects.js")
   script.
     $(document).ready(function() {
-      getPatients();
+      getSubjects();
     });

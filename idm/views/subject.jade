@@ -1,0 +1,40 @@
+extends layout
+
+block content
+  div.subject
+    if (sssid == 0)
+      h2 New Subject
+    else
+      h2 Update Subject Information
+    form(action="/subjects/#{sssid}", method="POST")
+    
+      p SSSID *:
+      p
+        input.form-control(name="sssid", type="text", value=subject.sssid)
+      p Name:
+      p
+        input.form-control(name="name", type="text", value=subject.name)
+      p
+      p Birthdate * (YEAR-MM-DD):
+      p
+        input.form-control(name="bday", type="date", value=subject.bday)
+      p
+      p Email Address:
+      p
+        input.form-control(name="email", type="email", value=subject.email)
+      p
+        button(type="submit")
+          if (sssid == 0)
+            i.fa.fa-save &nbsp;Create
+          else
+            i.fa.fa-save &nbsp;Update
+        button(onclick="cancel();return false;")
+          i.fa.fa-stop &nbsp;Cancel
+
+      if !(typeof errorMessage === 'undefined')
+        p.errormsg= errorMessage
+
+      script.
+        function cancel() {
+          window.location.href = '/subjects'
+        }

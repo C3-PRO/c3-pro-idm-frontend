@@ -1,5 +1,5 @@
 /*
- API wrapper to get entolled patients
+ API wrapper to get entolled subjects
  */
 var express = require('express');
 var request = require('request');
@@ -11,7 +11,7 @@ var app = express();
 
 
 exports.mail = function (opt, func) {
-    var options = setBaseOptions(opt, config.mail.endpoint + "/" + opt.patientId, 'POST');
+    var options = setBaseOptions(opt, config.mail.endpoint + "/" + opt.sssid, 'POST');
     options.headers["Content-Type"] = "application/json";
     request(options, function (error, response, body) {
         console.log(response.statusCode)

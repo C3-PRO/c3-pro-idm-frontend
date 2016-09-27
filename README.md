@@ -1,6 +1,6 @@
 # C3PRO-IDM-FRONTEND #
 
-C3PRO-IDM-FRONTEND is a web-based application that implements a simple Identity and Demographics Manager system for myC3PRO project. It's used to send enrollment invitations to patients using the mobile iOS app and to link the invitation with the patient's sssid. 
+C3PRO-IDM-FRONTEND is a web-based application that implements a simple Identity and Demographics Manager system for myC3PRO project. It's used to send enrollment invitations to subjects using the mobile iOS app and to link the invitation with the SSSID. 
 
 The system manages PHI data, and it's supposed to run in a site's intranet. The system does not access directly any database. Data access is wrapped through [C3PRO-IDM_SERVICE](https://bitbucket.org/ihlchip/c3pro-idm-service) system, which publishes a secured API for this purpose.
 
@@ -71,8 +71,8 @@ They specify the host, port, http protocol and end points of the C3PRO-IDM-SERVI
 
 This environment uses mock services and does not require access to C3PRO-IDM-SERVICE. Is it useful   for purely front-end tests and fast demos. The data that appears there is written in static files in the following locations:
 
-    $PROJECT_HOME/idm/services/testPatients.json
-    $PROJECT_HOME/idm/services/testPatient.json
+    $PROJECT_HOME/idm/services/testSubjects.json
+    $PROJECT_HOME/idm/services/testSubject.json
 
 To run in such environment:
 

@@ -1,5 +1,5 @@
 {
-  "patients": [
+  "subjects": [
     {
       "id": "123456",
       "email": "johndoe@johndoe.com",

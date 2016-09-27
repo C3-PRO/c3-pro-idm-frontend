@@ -8,7 +8,7 @@ var session = require('express-session');
 
 var routes = require('./routes/index');
 var login = require('./routes/login');
-var patients = require('./routes/patients');
+var subjects = require('./routes/subjects');
 var logout = require('./routes/logout');
 var mail = require('./routes/mail');
 
@@ -32,7 +32,7 @@ app.use(session({secret: 'ssshhhhh'}));
 app.use('/', routes);
 app.use('/login', login);
 app.use('/logout', logout);
-app.use('/patients', patients);
+app.use('/subjects', subjects);
 app.use('/mail', mail);
 
 // catch 404 and forward to error handler

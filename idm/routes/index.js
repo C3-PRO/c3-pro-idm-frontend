@@ -5,8 +5,8 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
     var sess = req.session;
     if (sess.token) {
-        // there is a valid session. Lets redirect to patients lists
-        res.redirect('/patients');
+        // there is a valid session. Lets redirect to subjects lists
+        res.redirect('/subjects');
     }
     else {
         res.redirect('/login');

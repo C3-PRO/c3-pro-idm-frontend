@@ -1,9 +1,9 @@
 
-.pure-table .patient_name {
+.pure-table .subject_name {
 	font-weight: bold;
 }
 
-.pure-table .patient_name {
+.pure-table .subject_name {
 	font-weight: bold;
 }
 .pure-table td.sssid,
@@ -12,10 +12,10 @@
 	text-align: center; vertical-align: middle;
 }
 
-.pure-table td.patient_status {
+.pure-table td.subject_status {
 	text-align: center; vertical-align: middle;
 }
-.pure-table td.patient_status > div {
+.pure-table td.subject_status > div {
 	display: inline-block;
 	width: 1em; height: 1em;
 	font-size: 0.8em; line-height: 1.5;

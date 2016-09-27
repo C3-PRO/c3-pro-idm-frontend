@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var service = require('../services/patients');
+var service = require('../services/subjects');
 var config = require('../utils.js');
 
 
@@ -15,7 +15,7 @@ router.get('/api/:page/:perpage', function(req, res, next) {
             status: req.query.status,
             res: res,
         };
-        service.getPatients(opt, function(data, opt) {
+        service.getSubjects(opt, function(data, opt) {
             if (data.body) {
                 opt.res.json({data: data.body});
             }
@@ -28,7 +28,7 @@ router.get('/api/:page/:perpage', function(req, res, next) {
                     });
                 }
                 opt.res.json({
-                    error: responseError(data.error || "error getting patients", data.statusCode),
+                    error: responseError(data.error || "error getting subjects", data.statusCode),
                 });
             }
         });
@@ -42,7 +42,7 @@ router.get('/api/:page/:perpage', function(req, res, next) {
 
 
 /**
- *  GET single patient. 
+ *  GET single subject. 
  */
 router.get('/:id', function(req, res, next) {
     var sess = req.session;
@@ -50,104 +50,105 @@ router.get('/:id', function(req, res, next) {
     if (sess.token) {
         var opt = {
             token: token,
-            patientId: req.params.id,
+            sssid: req.params.id,
             sess: sess,
             res: res,
         };
         var callback = function (data, opt) {
             if (data.body) {
-                opt.res.render('patient', {
-                    patientId: opt.patientId,
-                    patient: data.body,
+                opt.res.render('subject', {
+                    sssid: opt.sssid,
+                    subject: data.body,
                 });
             }
             else if (data.statusCode == 401) {
-                forceLogin(opt.sess, opt.res, '/patients/'+req.params.id);
+                forceLogin(opt.sess, opt.res, '/subjects/'+req.params.id);
             }
             else {
-                var err = data.error || "Error retrieving patient";
+                var err = data.error || "Error retrieving subject";
                 opt.res.render('error', {
                     errorMessage: err,
                     status: data.statusCode,
-                    destination: '/patients',
+                    destination: '/subjects',
                 });
             }
         };
         
-        // we use "0" to indicate that we want to create a new patient
+        // we use "0" to indicate that we want to create a new subject
         if (req.params.id > 0) {
-            service.getPatient(opt, callback);
+            service.getSubject(opt, callback);
         }
         else {
             callback({body: {}}, opt);
         }
     }
     else {
-        res.redirect('/login?dest=/patients/'+req.params.id);
+        res.redirect('/login?dest=/subjects/'+req.params.id);
     }
 });
 
 
 
 /**
- *  Update patient
+ *  Update subject
  */
 router.post('/:id', function(req, res, next) {
     if (req.session.token) {
-        var patient = {
+        var subject = {
             sssid: req.body.sssid,
             name: req.body.name,
+            bday: req.body.bday,
             email: req.body.email,
         };
         var opt = {
             token: req.session.token,
-            patientId: req.params.id,
+            sssid: req.params.id,
             sess: req.session,
             res: res,
         };
         var callback = function(data, opt) {
-            console.log('routes/patients/(update|new)Patient:', data);
+            console.log('routes/subjects/(update|new)Subject:', data);
             if (data.body) {
                 opt.res.render('msg', {
-                    "message": (opt.patientId == 0) ? "Subject Created" : "Data Updated",
-                    "okref": "/patients"
+                    "message": (opt.sssid == 0) ? "Subject Created" : "Data Updated",
+                    "okref": "/subjects"
                 })
             }
             else if (data.statusCode == 401) {
-                forceLogin(opt.sess, opt.res, '/patients/'+opt.patientId);
+                forceLogin(opt.sess, opt.res, '/subjects/'+opt.sssid);
             }
             else {    // Validation problem, render what we had plus an error message
-                opt.res.render('patient', {
-                    patientId: opt.patientId,
-                    patient: patient,
+                opt.res.render('subject', {
+                    sssid: opt.sssid,
+                    subject: subject,
                     errorMessage: data.error || "Failed to store data, please try again",
                 });
             }
         };
         
-        // again, patient id of "0" means new patient
-        if (opt.patientId > 0) {
-            service.updatePatient(opt, patient, callback);
+        // again, subject id of "0" means new subject
+        if (opt.sssid > 0) {
+            service.updateSubject(opt, subject, callback);
         }
         else {
-            service.newPatient(opt, patient, callback);
+            service.newSubject(opt, subject, callback);
         }
     }
     else {
-        res.redirect('/login?dest=/patients/'+req.params.id);
+        res.redirect('/login?dest=/subjects/'+req.params.id);
     }
 });
 
 
 /**
- *  GET home page - redirect to 'patients'
+ *  GET home page - redirect to 'subjects'
  */
 router.get('/', function(req, res, next) {
     if (req.session.token) {
-        res.render('patients');
+        res.render('subjects');
     }
     else {
-        res.redirect('/login?dest=/patients');
+        res.redirect('/login?dest=/subjects');
     }
 });
 

@@ -1,12 +1,12 @@
 /**
- *  Patient related functions.
+ *  Subject related functions.
  */
-function getPatients(searchstring, start, batch) {
-	loadPatientData(searchstring, start, batch,
+function getSubjects(searchstring, start, batch) {
+	loadSubjectData(searchstring, start, batch,
 		function(data) {
 			var template = $('#tmpl_row').html();
 			Mustache.parse(template);
-			var tbody = $('#patients').empty();
+			var tbody = $('#subjects').empty();
 			for (var i = 0; i < data.length; i++) {
 				var rendered = Mustache.render(template, data[i]);
 				tbody.append(rendered);
@@ -14,16 +14,16 @@ function getPatients(searchstring, start, batch) {
 		},
 		function(error) {
 			if (error && 'status' in error && 401 == error.status) {
-				provokeLogin('/patients');
+				provokeLogin('/subjects');
 			}
 		}
 	);
 }
 
-function loadPatientData(searchstring, start, batch, success, error) {
+function loadSubjectData(searchstring, start, batch, success, error) {
 	var st = start ? start : 0;
 	var b = batch ? parseInt(batch) : 50;
-	$.getJSON('/patients/api/'+st+'/'+(b || 50), function(json, status, req) {
+	$.getJSON('/subjects/api/'+st+'/'+(b || 50), function(json, status, req) {
 		if ('data' in json) {
 			console.log('GOT DATA', json);
 			success(json.data);
