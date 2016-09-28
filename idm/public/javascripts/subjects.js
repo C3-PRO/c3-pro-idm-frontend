@@ -25,7 +25,6 @@ function loadSubjectData(searchstring, start, batch, success, error) {
 	var b = batch ? parseInt(batch) : 50;
 	$.getJSON('/subjects/api/'+st+'/'+(b || 50), function(json, status, req) {
 		if ('data' in json) {
-			console.log('GOT DATA', json);
 			success(json.data);
 		}
 		else if ('error' in json) {
@@ -38,3 +37,24 @@ function loadSubjectData(searchstring, start, batch, success, error) {
 	});
 }
 
+function showQRCode(sssid) {
+	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {
+		if ('body' in json) {
+			console.log('showQRCode()', json, status);
+		}
+		else {
+			console.error(status, json);
+			var msg = ('errorMessage' in json) ? json.errorMessage : "Could not retrieve QR code";
+			alert(msg);
+		}
+	})
+	.fail(function(req, status, error) {
+		console.error(status, error);
+		if (401 == req.status) {
+			provokeLogin('/subjects');
+		}
+		else {
+			alert(error);
+		}
+	});
+}

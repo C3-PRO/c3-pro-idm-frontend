@@ -11,6 +11,13 @@
     "endpoint": "/subject",
     "token_type": "JWT"
   },
+  "links": {
+    "host": "127.0.0.1",
+    "port": 9096,
+    "protocol": "http",
+    "endpoint": "/link",
+    "token_type": "JWT"
+  },
   "oauth": {
     "host": "127.0.0.1",
     "port": 9096,

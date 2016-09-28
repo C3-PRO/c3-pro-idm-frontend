@@ -38,6 +38,13 @@ The following command starts the web server on port 8080
 $PROJECT_HOME/idm/npm start
 ```
 
+To have the server auto-restart on file changes – useful during development – use `nodemon`:
+
+```
+cd idm
+nodemon app.js
+```
+
 ## Deployment modes ##
 
 The system can be deployed in the following environments: *test*, *dev*, *qa*, *prod*. It is determined by the value of the system environment variable *NODE_ENV*. For instance, to run the server in production:

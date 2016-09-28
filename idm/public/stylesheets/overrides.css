@@ -31,3 +31,7 @@
 .status3 {
 	background-color: #900 !important;
 }
+
+.small, .pure-table .small {
+	font-size: 0.85em;
+}

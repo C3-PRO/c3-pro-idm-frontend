@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var service = require('../services/subjects');
+var links_service = require('../services/links');
 var config = require('../utils.js');
+var isodate = require('isodate');
 
 
 router.get('/api/:page/:perpage', function(req, res, next) {
@@ -107,11 +109,11 @@ router.post('/:id', function(req, res, next) {
             res: res,
         };
         var callback = function(data, opt) {
-            console.log('routes/subjects/(update|new)Subject:', data);
+            //console.log('---- routes/subjects/(update|new)Subject:', data);
             if (data.body) {
                 opt.res.render('msg', {
-                    "message": (opt.sssid == 0) ? "Subject Created" : "Data Updated",
-                    "okref": "/subjects"
+                    message: (opt.sssid == 0) ? "Subject Created" : "Data Updated",
+                    okref: '/subjects'
                 })
             }
             else if (data.statusCode == 401) {
@@ -136,6 +138,78 @@ router.post('/:id', function(req, res, next) {
     }
     else {
         res.redirect('/login?dest=/subjects/'+req.params.id);
+    }
+});
+
+
+/**
+ *  GET one QR code for a subject; picks an existing one if it hasn't expired
+ *  yet, if there is none creates a new one.
+ */
+router.get('/:id/qrcode', function(req, res, next) {
+    var sess = req.session;
+    var token = sess.token;
+    if (sess.token) {
+        var opt = {
+            token: token,
+            sssid: req.params.id,
+            sess: sess,
+            res: res,
+        };
+        
+        // get all Links for this subject and pick the first without `exp` expiration date, if any
+        service.getSubjectLinks(opt, function(data, opt) {
+            //console.log('---- router.get(/:id/qrcode)', data);
+            if (data.body && 'data' in data.body) {
+                var useLink = null;
+                var now = Date();
+                for (var i = 0; i < data.body.data.length; i++) {
+                    var exp = data.body.data[i].exp ? isodate(data.body.data[i].exp) : null;
+                    if (!exp || exp > now) {
+                        useLink = data.body.data[i];
+                        break;
+                    }
+                }
+                var callback = function(opt, jti) {
+                    opt.jti = jti;
+                    links_service.getQRCode(opt, function(data, opt) {
+                        console.log('---- links_service.getQRCode()', data);
+                        opt.res.json(data);
+                    });
+                };
+                
+                // request QR code for existing link
+                if (useLink) {
+                    //console.log('---- reusing QR code for', useLink);
+                    callback(opt, useLink._id);
+                }
+                
+                // create a new one
+                else {
+                    console.log('---- creating new QR code')
+                    service.createSubjectLink(opt, function(data, opt) {
+                        console.log('---- service.createSubjectQRCode()', data);
+                        // TODO: check for error
+                        callback(opt, data.body._id);
+                    });
+                }
+            }
+            else {
+                var err = data.error || "Error retrieving subject";
+                opt.res.json({
+                    errorMessage: err,
+                    status: data.statusCode,
+                    destination: '/subjects',
+                });
+            }
+        });
+    }
+    else {
+        res.status(401).json({
+            errorMessage: "Unauthorized",
+            status: 401,
+            destination: '/subjects',
+        });
     }
 });
 

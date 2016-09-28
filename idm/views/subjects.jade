@@ -7,9 +7,10 @@ block content
       tr
         th 
         th SSSID
-        th Participant
+        th Name
         th Created
         th Changed
+        th
         th 
         th 
 
@@ -28,14 +29,18 @@ block content
       <td>
         <div class="subject_name">{{ name }}</div>
         {{#email}}<a class="subject_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
+        {{^email}}<i class="small">no&nbsp;email</i>{{/email}}
       </td>
-      <td>{{ createdDate }}</td>
-      <td>{{ changedDate }}</td>
+      <td class="small">{{ createdDate }}</td>
+      <td class="small">{{ changedDate }}</td>
+      <td class="action">
+        <a href="javascript:void(0);" onclick="showQRCode('{{ sssid }}')"><i class="fa fa-qrcode"></i></a>
+      </td>
       <td class="action">
         <a href="/mail/\#{{ sssid }}"><i class="fa fa-envelope{{#status}}-o{{/status}}"></i></a>
       </td>
       <td class="action">
-        <a href="/subjects/{{ sssid }}"><i class="fa fa-arrow-circle-right"></i></a>
+        <a href="/subjects/{{ sssid }}"><i class="fa fa-pencil"></i></a>
       </td>
     </tr>
 

@@ -20,7 +20,7 @@ exports.getSubjects = function(opt, func) {
     var options = setBaseOptions(opt, fullEndPoint, 'GET');
     
     request(options, function(error, response, body) {
-        var data = dataOnJSONResponse(error, response, body, function(parsed) {
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body, function(parsed) {
             var subjects = parsed.data || parsed.subjects;
             for (var i = 0; i < subjects.length; i++) {
                 manipulateSubjectData(subjects[i]);
@@ -34,7 +34,7 @@ exports.getSubjects = function(opt, func) {
 exports.getSubject = function(opt, func) {
     var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid, 'GET');
     request(options, function(error, response, body) {
-        var data = dataOnJSONResponse(error, response, body, function(parsed) {
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body, function(parsed) {
             var subject = parsed.data || parsed.subject;
             manipulateSubjectData(subject);
             return subject;
@@ -50,8 +50,7 @@ exports.newSubject = function(opt, subject, func) {
     //console.log('-->', options.body);
     
     request(options, function(error, response, body) {
-        console.log('services/subjects/newSubject:', body);
-        var data = dataOnJSONResponse(error, response, body);
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body);
         func(data, opt);
     });
 }
@@ -63,11 +62,35 @@ exports.updateSubject = function(opt, subject, func) {
     
     request(options, function(error, response, body) {
         //console.log('services/subjects/updateSubject:', body);
-        var data = dataOnJSONResponse(error, response, body);
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body);
         func(data, opt);
     });
-
 }
+
+exports.getSubjectLinks = function(opt, func) {
+    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/links', 'GET');
+    options.headers["Accept"] = "application/json";
+    
+    request(options, function(error, response, body) {
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body);
+        func(data, opt);
+    });
+}
+
+exports.createSubjectLink = function(opt, func) {
+    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/links', 'POST');
+    options.headers["Accept"] = "application/json";
+    
+    request(options, function(error, response, body) {
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body);
+        func(data, opt);
+    });
+}
+
+
+/****************
+ Helper functions
+ ***************/
 
 function setBaseOptions(opt, endpoint, method) {
     var options = {
@@ -78,20 +101,6 @@ function setBaseOptions(opt, endpoint, method) {
         }
     }
     return options;
-}
-
-function dataOnJSONResponse(error, response, body, manipulateFuncOnSuccess) {
-    var data = {
-        statusCode: response.statusCode,
-    };
-    var parsed = body ? JSON.parse(body) : {};
-    if (response.statusCode < 400) {
-        data.body = manipulateFuncOnSuccess ? manipulateFuncOnSuccess(parsed) : parsed;
-    }
-    else {
-        data.error = (parsed.error && parsed.error.message) ? parsed.error.message : error;
-    }
-    return data;
 }
 
 function manipulateSubjectData(subject) {
