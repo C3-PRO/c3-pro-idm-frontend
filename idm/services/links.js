@@ -1,6 +1,7 @@
 var express = require('express');
 var request = require('request');
 var config = require('../utils.js');
+var QRCode = require('qrcode');
 var exports = module.exports = {};
 var app = express();
 
@@ -8,7 +9,7 @@ var app = express();
 
 exports.getJWTForLink = function(opt, func) {
 	if (!('jti' in opt)) {
-		var data = {error: "No `jti` provided on `opt` parameter passed into `getQRCode()`"};
+		var data = {error: "No `jti` provided on `opt` parameter passed into `getJWTForLink()`"};
 		func(data, opt);
 		return;
 	}
@@ -26,15 +27,29 @@ exports.getJWTForLink = function(opt, func) {
 exports.getQRCode = function(opt, func) {
 	exports.getJWTForLink(opt, function(data, opt) {
 		if ('body' in data) {
-			data.body = qrCodeForJWT(data.body);
+			qrCodeForJWT(data.body, function(path, error) {
+                data.qrcode = path;
+                data.errorMessage = error;
+                func(data, opt);
+            });
 		}
-		func(data, opt);
+        else {
+    		func(data, opt);
+        }
 	});
 };
 
-function qrCodeForJWT(jwt) {
-	// TODO: return actual QR-code, either temp image or base64'd data
-	return 'img:'+jwt;
+function qrCodeForJWT(jwt, callback) {
+    var path = 'tmp/qrcode_'+((new Date()).getTime())+'.png';
+    QRCode.save('public/'+path, jwt, function (error, written) {
+        if (error) {
+            console.error('qrCodeForJWT() error:', error);
+            callback(null, "Failed to write QR code image");
+        }
+        else {
+            callback(path, null);
+        }
+    });
 }
 
 function setBaseOptions(opt, endpoint, method) {

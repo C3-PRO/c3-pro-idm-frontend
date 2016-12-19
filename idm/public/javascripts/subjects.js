@@ -52,17 +52,16 @@ function loadSubjectsData(searchstring, start, batch, success, error) {
 
 function showQRCode(sssid) {
 	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {
-		if ('body' in json) {
-			console.log('showQRCode()', json, status);
+		if ('qrcode' in json && json.qrcode) {
+			showBlackout(qrCodeOverlay(json.qrcode));
 		}
 		else {
-			console.error(status, json);
-			var msg = ('errorMessage' in json) ? json.errorMessage : "Could not retrieve QR code";
-			alert(msg);
+			console.error('showQRCode() error:', status, json);
+			alert(('errorMessage' in json) ? json.errorMessage : "Could not retrieve QR code");
 		}
 	})
 	.fail(function(req, status, error) {
-		console.error(status, error);
+		console.error('showQRCode() failed:', status, error);
 		if (401 == req.status) {
 			provokeLogin('/subjects');
 		}
@@ -71,3 +70,26 @@ function showQRCode(sssid) {
 		}
 	});
 }
+
+function qrCodeOverlay(path) {
+	var img = $('<img src="'+path+'" alt="QR Code"/>');
+	var div = $('<div/>').addClass('qrpopover');
+	div.append(img);
+	img.click(removeBlackout);
+	
+	return div;
+}
+
+function showBlackout(element) {
+	$('#blackout').remove();
+	var parent = $('<div/>').attr({'id': 'blackout'});
+	parent.append(element);
+	parent.click(removeBlackout);
+	
+	$(document.body).append(parent);
+}
+
+function removeBlackout() {
+	$('#blackout').fadeOut('fast', function() { $(this).remove(); });
+}
+

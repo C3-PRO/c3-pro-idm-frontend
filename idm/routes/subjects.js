@@ -159,7 +159,6 @@ router.get('/:id/qrcode', function(req, res, next) {
         
         // get all Links for this subject and pick the first without `exp` expiration date, if any
         service.getSubjectLinks(opt, function(data, opt) {
-            //console.log('---- router.get(/:id/qrcode)', data);
             if (data.body && 'data' in data.body) {
                 var useLink = null;
                 var now = Date();
@@ -178,13 +177,11 @@ router.get('/:id/qrcode', function(req, res, next) {
                     });
                 };
                 
-                // request QR code for existing link
+                // request QR code for existing link or create a new one
                 if (useLink) {
-                    //console.log('---- reusing QR code for', useLink);
+                    console.log('---- reusing QR code for', useLink);
                     callback(opt, useLink._id);
                 }
-                
-                // create a new one
                 else {
                     console.log('---- creating new QR code')
                     service.createSubjectLink(opt, function(data, opt) {
