@@ -7,9 +7,13 @@
 	font-weight: bold;
 }
 .pure-table td.sssid,
-.pure-table td.action {
+.pure-table td.action,
+.pure-table td.message {
 	font-size: 1.5em;
 	text-align: center; vertical-align: middle;
+}
+.pure-table td.message {
+	padding: 2em;
 }
 
 .pure-table td.subject_status {
@@ -34,4 +38,7 @@
 
 .small, .pure-table .small {
 	font-size: 0.85em;
+}
+.error {
+	color: #900;
 }

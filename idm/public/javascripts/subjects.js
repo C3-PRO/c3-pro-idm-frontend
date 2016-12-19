@@ -2,25 +2,38 @@
  *  Subject related functions.
  */
 function getSubjects(searchstring, start, batch) {
-	loadSubjectData(searchstring, start, batch,
+	loadSubjectsData(searchstring, start, batch,
 		function(data) {
 			var template = $('#tmpl_row').html();
 			Mustache.parse(template);
-			var tbody = $('#subjects').empty();
-			for (var i = 0; i < data.length; i++) {
-				var rendered = Mustache.render(template, data[i]);
-				tbody.append(rendered);
+			if (data.length > 0) {
+				var tbody = $('#subjects').empty();
+				for (var i = 0; i < data.length; i++) {
+					var rendered = Mustache.render(template, data[i]);
+					tbody.append(rendered);
+				}
+			}
+			else {
+				var td = $('#loading').empty();
+				td.append('<p>No subjects so far</p>');
+				td.append('<p><a href="subjects/0">Add a subject</a></p>');
 			}
 		},
 		function(error) {
-			if (error && 'status' in error && 401 == error.status) {
-				provokeLogin('/subjects');
+			if (error) {
+				if ('status' in error && 401 == error.status) {
+					provokeLogin('/subjects');
+				}
+				else {
+					var detail = ('message' in error) ? '<p>'+error['message']+'</p>' : '';
+					$('#loading').html('<p class="error">Failed getting subjects</p>'+detail);
+				}
 			}
 		}
 	);
 }
 
-function loadSubjectData(searchstring, start, batch, success, error) {
+function loadSubjectsData(searchstring, start, batch, success, error) {
 	var st = start ? start : 0;
 	var b = batch ? parseInt(batch) : 50;
 	$.getJSON('/subjects/api/'+st+'/'+(b || 50), function(json, status, req) {
@@ -28,7 +41,7 @@ function loadSubjectData(searchstring, start, batch, success, error) {
 			success(json.data);
 		}
 		else if ('error' in json) {
-			console.error(json.error);
+			console.error("loadSubjectsData() error:", json.error);
 			error(json.error);
 		}
 		else {

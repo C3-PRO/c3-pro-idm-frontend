@@ -10,7 +10,7 @@ else if (app.get('env') === 'prod') {
     config = require('./config.prod.json');
 }
 else {
-	config = require('./config.dev.json');
+    config = require('./config.dev.json');
 }
 
 /**

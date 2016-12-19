@@ -9,15 +9,15 @@ block content
         th SSSID
         th Name
         th Created
-        th Changed
+        th Updated
         th
         th 
         th 
 
     tbody#subjects
       tr
-        td(colspan='7')
-          p loading subjects...
+        td#loading.message(colspan='8')
+          p Loading subjects...
 
   script(id='tmpl_row', type='x-tmpl-mustache').
     <tr>

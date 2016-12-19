@@ -45,6 +45,8 @@ cd idm
 nodemon app.js
 ```
 
+(Install _nodemon_ like so: `npm install -g nodemon`)
+
 ## Deployment modes ##
 
 The system can be deployed in the following environments: *test*, *dev*, *qa*, *prod*. It is determined by the value of the system environment variable *NODE_ENV*. For instance, to run the server in production:

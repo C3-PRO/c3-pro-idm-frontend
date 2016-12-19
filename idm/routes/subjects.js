@@ -56,7 +56,7 @@ router.get('/:id', function(req, res, next) {
             sess: sess,
             res: res,
         };
-        var callback = function (data, opt) {
+        var callback = function(data, opt) {
             if (data.body) {
                 opt.res.render('subject', {
                     sssid: opt.sssid,
@@ -77,7 +77,7 @@ router.get('/:id', function(req, res, next) {
         };
         
         // we use "0" to indicate that we want to create a new subject
-        if (req.params.id > 0) {
+        if (0 !== req.params.id) {
             service.getSubject(opt, callback);
         }
         else {
