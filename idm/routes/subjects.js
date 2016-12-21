@@ -5,17 +5,15 @@ var config = require('../utils.js');
 var isodate = require('isodate');
 
 
-router.get('/api/:page/:perpage', function(req, res, next) {
+router.get('/api/:page/:perpage/:ordercol/:orderdir', function(req, res, next) {
     var sess = req.session;
     if (sess.token) {
-        var opt = {
-            token: sess.token,
-            sess: sess,
-            page: req.params.page,
-            perpage: req.params.perpage,
-            status: req.query.status,
-            res: res,
-        };
+        var opt = req.params;
+        opt.token = sess.token;
+        opt.sess = sess;
+        opt.status = req.query.status;
+        opt.res = res;
+        
         service.getSubjects(opt, function(data, opt) {
             if (data.data) {
                 opt.res.json(data);
@@ -126,11 +124,11 @@ router.post('/:id', function(req, res, next) {
         };
         
         // again, subject id of "0" means new subject
-        if (opt.sssid > 0) {
-            service.updateSubject(opt, subject, callback);
+        if (0 == opt.sssid || '0' == opt.sssid) {
+            service.newSubject(opt, subject, callback);
         }
         else {
-            service.newSubject(opt, subject, callback);
+            service.updateSubject(opt, subject, callback);
         }
     }
     else {

@@ -1,23 +1,40 @@
 /**
  *  Subject related functions.
  */
-function getSubjects(searchstring, start, batch) {
-	loadSubjectsData(searchstring, start, batch,
+
+
+/**
+Get `num` most recently worked on subjects.
+*/
+function getRecentSubjects(num, callback) {
+	loadSubjectsData(null, 0, num || 3, 'changed', 'DESC',
 		function(data) {
-			var template = $('#tmpl_row').html();
-			Mustache.parse(template);
-			if (data.length > 0) {
-				var tbody = $('#subjects').empty();
-				for (var i = 0; i < data.length; i++) {
-					var rendered = Mustache.render(template, data[i]);
-					tbody.append(rendered);
-				}
-			}
-			else {
-				var td = $('#loading').empty();
-				td.append('<p>No subjects so far</p>');
+			var tbl = $('#recent');
+			var num = renderSubjectsInto(data, tbl);
+			if (0 == num) {
+				var td = tbl.find('.loading').empty();
+				td.append('<p>No subjects</p>');
 				td.append('<p><a href="subjects/0">Add a subject</a></p>');
 			}
+			callback(num);
+		},
+		function(error) {
+			if (error && 401 == error.statusCode) {
+				provokeLogin('/subjects');
+			}
+			else {
+				var detail = (error && 'errorMessage' in error) ? '<p>'+error.errorMessage+'</p>' : '';
+				$('#recent .loading').html('<p class="error">Failed getting recent subjects</p>'+detail);
+			}
+		}
+	);
+}
+
+function getSubjects(searchstring, start, batch) {
+	loadSubjectsData(searchstring, start, batch, 'name', 'ASC',
+		function(data) {
+			var tbl = $('#subjects');
+			renderSubjectsInto(data, tbl);
 		},
 		function(error) {
 			if (error) {
@@ -33,21 +50,43 @@ function getSubjects(searchstring, start, batch) {
 	);
 }
 
-function loadSubjectsData(searchstring, start, batch, success, error) {
+function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, successCB, errorCB) {
 	var st = start ? start : 0;
 	var b = batch ? parseInt(batch) : 50;
-	$.getJSON('/subjects/api/'+st+'/'+(b || 50), function(json, status, req) {
+	var oCol = orderCol || 'name';
+	var oDir = (orderDir && 'desc' == orderDir.toLowerCase()) ? orderDir : 'ASC';
+	var url = '/subjects/api/'+st+'/'+(b || 50)+'/'+oCol+'/'+oDir;
+	$.getJSON(url + (searchstring ? '&search='+encodeURI(searchstring) : ''), function(json, status, req) {
 		if ('data' in json) {
-			success(json.data);
-		}
-		else if ('error' in json) {
-			console.error("loadSubjectsData() error:", json.error);
-			error(json.error);
+			successCB(json.data);
 		}
 		else {
-			error();
+			errorCB(json);
+		}
+	})
+	.fail(function(req, status, error) {
+		console.error('loadSubjectsData() failed:', status, error);
+		if (401 == req.status) {
+			provokeLogin('/subjects');
+		}
+		else {
+			errorCB(error);
 		}
 	});
+}
+
+function renderSubjectsInto(data, table) {
+	var i = 0;
+	var template = $('#tmpl_row').html();
+	Mustache.parse(template);
+	if (data.length > 0) {
+		var tbody = table.empty();
+		for (; i < data.length; i++) {
+			var rendered = Mustache.render(template, data[i]);
+			tbody.append(rendered);
+		}
+	}
+	return i+1;
 }
 
 function markConsented(sssid) {
@@ -55,7 +94,7 @@ function markConsented(sssid) {
 		if ('data' in json && json.data) {
 			var template = $('#tmpl_row').html();
 			var rendered = Mustache.render(template, json.data);
-			$('#row_'+sssid).replaceWith(rendered);
+			$('.row_'+sssid).replaceWith(rendered);
 		}
 		else {
 			reportError(status, json, 'markConsented() error:', "Failed to mark subject as consented");

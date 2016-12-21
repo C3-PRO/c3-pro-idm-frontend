@@ -12,7 +12,7 @@ var app = express();
 
 exports.getSubjects = function(opt, func) {
     var sssid = opt.sssid;
-    var fullEndPoint = config.subjects.endpoint + '?page='+opt.page+'&perpage='+opt.perpage;
+    var fullEndPoint = config.subjects.endpoint + '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
     if (typeof opt.status != 'undefined') {
         fullEndPoint = fullEndPoint + '&status=' + opt.status;
     }
@@ -197,10 +197,10 @@ function setSubjectStatusString(subject) {
 
 function formatSubjectDates(subject) {
     if (subject.created) {
-        subject.createdDate = moment(subject.created).calendar();
+        subject.createdDate = moment(subject.created * 1000).calendar();
     }
     if (subject.changed) {
-        subject.changedDate = moment(subject.changed).calendar();
+        subject.changedDate = moment(subject.changed * 1000).calendar();
     }
     if (subject.date_invited) {
         subject.invitedDate = moment(subject.date_invited).calendar();

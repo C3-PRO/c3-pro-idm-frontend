@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  .center
+  h1 Recent Subjects
   table.pure-table
     thead
       tr
@@ -14,13 +14,32 @@ block content
         th 
         th 
 
-    tbody#subjects
+    tbody#recent
       tr
-        td#loading.message(colspan='8')
-          p Loading subjects...
+        td.loading.message(colspan='8')
+          p Loading recent subjects...
+  
+  #all
+    h1 All Subjects
+    table.pure-table
+      thead
+        tr
+          th 
+          th SSSID
+          th Name
+          th Consented
+          th Enrolled
+          th.small Updated
+          th 
+          th 
+
+      tbody#subjects
+        tr
+          td.loading.message(colspan='8')
+            p Loading all subjects...
 
   script(id='tmpl_row', type='x-tmpl-mustache').
-    <tr id="row_{{ sssid }}">
+    <tr class="row_{{ sssid }}">
       <td class="subject_status">
         <div class="status{{ status }}"></div><br>
         {{ human_status }}
@@ -28,12 +47,12 @@ block content
       <td class="sssid">{{ sssid }}</td>
       <td>
         <div class="subject_name">{{ name }}</div>
-        {{#email}}<a class="subject_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
+        {{#email}}<a class="small" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
         {{^email}}<i class="small">no&nbsp;email</i>{{/email}}
       </td>
       <td>
         {{#date_consented}}{{ consentedDate }}{{/date_consented}}
-        {{^date_consented}}<a href="javascript:void(0);" onclick="markConsented('{{ sssid }}')">record<br>consent</a>{{/date_consented}}
+        {{^date_consented}}<a href="javascript:void(0);" onclick="markConsented('{{ sssid }}')"><b>record consent</b></a>{{/date_consented}}
       </td>
       <td>
         {{#date_enrolled}}{{ enrolledDate }}{{/date_enrolled}}
@@ -52,5 +71,10 @@ block scripts
   script(src="/javascripts/subjects.js")
   script.
     $(document).ready(function() {
-      getSubjects();
+      getRecentSubjects(3, function(n) {
+        if (n > 3) {
+          $('#all').show();
+          getSubjects();
+        }
+      });
     });
