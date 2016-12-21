@@ -14,22 +14,23 @@ else {
 }
 
 /**
- *  Returns an object that contains `statusCode` and either `body` (filled with
+ *  Returns an object that contains `statusCode` and either `data` (filled with
  *  response data passed through the optional `manipulateFuncOnSuccess`
- *  argument) or `error`.
+ *  argument) or `errorMessage`.
  */
-config.dataBodyOrErrorFromJSONResponse = function(error, response, body, manipulateFuncOnSuccess) {
-    var data = {
+config.dataOrErrorFromJSONResponse = function(error, response, body, manipulateFuncOnSuccess) {
+    var json = {
         statusCode: response.statusCode,
     };
     var parsed = body ? JSON.parse(body) : {};
     if (response.statusCode < 400) {
-        data.body = manipulateFuncOnSuccess ? manipulateFuncOnSuccess(parsed) : parsed;
+        var manipulated = manipulateFuncOnSuccess ? manipulateFuncOnSuccess(parsed) : parsed;
+        json.data = ('data' in manipulated) ? manipulated.data : manipulated;
     }
     else {
-        data.error = (parsed.error && parsed.error.message) ? parsed.error.message : error;
+        json.errorMessage = (parsed.error && parsed.error.message) ? parsed.error.message : error;
     }
-    return data;
+    return json;
 }
 
 module.exports = config;

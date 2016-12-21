@@ -52,14 +52,13 @@ function loadSubjectsData(searchstring, start, batch, success, error) {
 
 function markConsented(sssid) {
 	$.getJSON('/subjects/'+sssid+'/didConsent', function(json, status, req) {
-		if ('body' in json && json.body && 'data' in json.body) {
+		if ('data' in json && json.data) {
 			var template = $('#tmpl_row').html();
-			var rendered = Mustache.render(template, json.body.data);
+			var rendered = Mustache.render(template, json.data);
 			$('#row_'+sssid).replaceWith(rendered);
 		}
 		else {
-			console.error('markConsented() error:', status, json);
-			alert(('errorMessage' in json) ? json.errorMessage : "Failed to mark subject as consented");
+			reportError(status, json, 'markConsented() error:', "Failed to mark subject as consented");
 		}
 	})
 	.fail(function(req, status, error) {
@@ -75,12 +74,11 @@ function markConsented(sssid) {
 
 function showQRCode(sssid) {
 	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {
-		if ('body' in json && json.body) {
-			showBlackout(qrCodeOverlay(json.body));
+		if ('data' in json && json.data) {
+			showBlackout(qrCodeOverlay(json.data));
 		}
 		else {
-			console.error('showQRCode() error:', status, json);
-			alert(('errorMessage' in json) ? json.errorMessage : "Could not retrieve QR code");
+			reportError(status, json, 'showQRCode() error:', "Could not retrieve QR code");
 		}
 	})
 	.fail(function(req, status, error) {

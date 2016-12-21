@@ -6,35 +6,39 @@ var exports = module.exports = {};
 var app = express();
 
 
-
 exports.getJWTForLink = function(opt, func) {
-	if (!('jti' in opt)) {
-		var data = {error: "No `jti` provided on `opt` parameter passed into `getJWTForLink()`"};
+	if (!('jti' in opt) || !opt.jti) {
+		var data = {errorMessage: "No `jti` provided on `opt` parameter passed into `getJWTForLink()`"};
 		func(data, opt);
 		return;
 	}
     var options = setBaseOptions(opt, config.links.endpoint+'/'+opt.jti+'/jwt', 'GET');
     options.headers['Accept'] = "application/jwt";
     request(options, function(error, response, body) {
-    	var data = config.dataBodyOrErrorFromJSONResponse(error, response, null);
-    	if (!('error' in data)) {
-    		data.body = body;
+        //console.log('services/links/getJWTForLink:', body);
+        if (response.statusCode < 400) {
+            func({'data': body, 'statusCode': response.statusCode}, opt);
         }
-    	func(data, opt);
+        else {
+        	var json = config.dataOrErrorFromJSONResponse(error, response, body);
+        	func(json, opt);
+        }
     });
 };
 
 exports.getQRCode = function(opt, func) {
-	exports.getJWTForLink(opt, function(data, opt) {
-		if ('body' in data) {
-			qrCodeForJWT(data.body, function(path, error) {
-                data.body = path;
-                data.errorMessage = error;
-                func(data, opt);
+	exports.getJWTForLink(opt, function(json, opt) {
+		if (json.data) {
+			qrCodeForJWT(json.data, function(path, error) {
+                json.data = path;
+                if (error) {
+                    json.errorMessage = error;
+                }
+                func(json, opt);
             });
 		}
         else {
-    		func(data, opt);
+    		func(json, opt);
         }
 	});
 };

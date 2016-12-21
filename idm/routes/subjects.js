@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var service = require('../services/subjects');
-var links_service = require('../services/links');
 var config = require('../utils.js');
 var isodate = require('isodate');
 
@@ -18,8 +17,8 @@ router.get('/api/:page/:perpage', function(req, res, next) {
             res: res,
         };
         service.getSubjects(opt, function(data, opt) {
-            if (data.body) {
-                opt.res.json({data: data.body});
+            if (data.data) {
+                opt.res.json(data);
             }
             else {
                 if (data.statusCode == 401) {
@@ -29,15 +28,14 @@ router.get('/api/:page/:perpage', function(req, res, next) {
                         }
                     });
                 }
-                opt.res.json({
-                    error: responseError(data.error || "error getting subjects", data.statusCode),
-                });
+                opt.res.json(data);
             }
         });
     }
     else {
         res.status(401).json({
-            error: {status: 401},
+            errorMessage: "Unauthorized",
+            statusCode: 401,
         });
     }
 });
@@ -56,21 +54,20 @@ router.get('/:id', function(req, res, next) {
             sess: sess,
             res: res,
         };
-        var callback = function(data, opt) {
-            if (data.body) {
+        var callback = function(json, opt) {
+            if (json.data) {
                 opt.res.render('subject', {
                     sssid: opt.sssid,
-                    subject: data.body,
+                    subject: json.data,
                 });
             }
-            else if (data.statusCode == 401) {
+            else if (json.statusCode == 401) {
                 forceLogin(opt.sess, opt.res, '/subjects/'+req.params.id);
             }
             else {
-                var err = data.error || "Error retrieving subject";
                 opt.res.render('error', {
-                    errorMessage: err,
-                    status: data.statusCode,
+                    errorMessage: json.errorMessage || "Error retrieving subject",
+                    statusCode: json.statusCode,
                     destination: '/subjects',
                 });
             }
@@ -81,7 +78,7 @@ router.get('/:id', function(req, res, next) {
             service.getSubject(opt, callback);
         }
         else {
-            callback({body: {}}, opt);
+            callback({data: {}}, opt);
         }
     }
     else {
@@ -108,22 +105,22 @@ router.post('/:id', function(req, res, next) {
             sess: req.session,
             res: res,
         };
-        var callback = function(data, opt) {
-            //console.log('---- routes/subjects/(update|new)Subject:', data);
-            if (data.body) {
+        var callback = function(json, opt) {
+            console.log('---- routes/subjects/(update|new)Subject:', json);
+            if (json.data) {
                 opt.res.render('msg', {
                     message: (opt.sssid == 0) ? "Subject Created" : "Data Updated",
                     okref: '/subjects'
                 })
             }
-            else if (data.statusCode == 401) {
+            else if (json.statusCode == 401) {
                 forceLogin(opt.sess, opt.res, '/subjects/'+opt.sssid);
             }
             else {    // Validation problem, render what we had plus an error message
                 opt.res.render('subject', {
                     sssid: opt.sssid,
                     subject: subject,
-                    errorMessage: data.error || "Failed to store data, please try again",
+                    errorMessage: json.errorMessage || "Failed to store data, please try again",
                 });
             }
         };
@@ -162,7 +159,7 @@ router.get('/:id/didConsent', function(req, res, next) {
     else {
         res.status(401).json({
             errorMessage: "Unauthorized",
-            status: 401,
+            statusCode: 401,
         });
     }
 })
@@ -182,64 +179,14 @@ router.get('/:id/qrcode', function(req, res, next) {
             sess: sess,
             res: res,
         };
-        
-        // get all Links for this subject and pick the first without `exp` expiration date, if any
-        service.getSubjectLinks(opt, function(data, opt) {
-            if (data.body && 'data' in data.body) {
-                var useLink = null;
-                var now = Date();
-                for (var i = 0; i < data.body.data.length; i++) {
-                    var exp = data.body.data[i].exp ? isodate(data.body.data[i].exp) : null;
-                    if (!exp || exp > now) {
-                        useLink = data.body.data[i];
-                        break;
-                    }
-                }
-                var callback = function(opt, jti) {
-                    opt.jti = jti;
-                    links_service.getQRCode(opt, function(data, opt) {
-                        console.log('---- links_service.getQRCode()', data);
-                        opt.res.json(data);
-                    });
-                };
-                
-                // request QR code for existing link or create a new one
-                if (useLink) {
-                    console.log('---- reusing QR code for', useLink);
-                    callback(opt, useLink._id);
-                }
-                else {
-                    console.log('---- creating new QR code')
-                    service.createSubjectLink(opt, function(data, opt) {
-                        console.log('---- service.createSubjectLink()', data);
-                        if (data.body) {
-                            callback(opt, data.body._id);
-                        }
-                        else if (data.statusCode == 401) {
-                            forceLogin(opt.sess, opt.res, '/subjects/'+opt.sssid);
-                        }
-                        else {
-                            opt.res.json({
-                                errorMessage: data.error || "Failed to create link",
-                                status: data.statusCode,
-                            });
-                        }
-                    });
-                }
-            }
-            else {
-                opt.res.json({
-                    errorMessage: data.error || "Error retrieving subject",
-                    status: data.statusCode,
-                });
-            }
+        service.getSubjectQRCode(opt, function(json, opt) {
+            opt.res.json(json);
         });
     }
     else {
         res.status(401).json({
             errorMessage: "Unauthorized",
-            status: 401,
-            destination: '/subjects',
+            statusCode: 401,
         });
     }
 });
@@ -267,13 +214,6 @@ function forceLogin(session, response, destination) {
         }
         response.redirect('/login' + (destination ? '?dest='+destination : ''));
     });
-}
-
-function responseError(errorMessage, statusCode) {
-    return {
-        "status": statusCode,
-        "message": errorMessage,
-    }
 }
 
 module.exports = router;

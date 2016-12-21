@@ -8,9 +8,9 @@ block content
         th 
         th SSSID
         th Name
-        th Created
-        th Updated
         th Consented
+        th Enrolled
+        th.small Updated
         th 
         th 
 
@@ -31,12 +31,15 @@ block content
         {{#email}}<a class="subject_email" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
         {{^email}}<i class="small">no&nbsp;email</i>{{/email}}
       </td>
-      <td class="small">{{ createdDate }}</td>
-      <td class="small">{{ changedDate }}</td>
-      <td class="action">
+      <td>
         {{#date_consented}}{{ consentedDate }}{{/date_consented}}
         {{^date_consented}}<a href="javascript:void(0);" onclick="markConsented('{{ sssid }}')">record<br>consent</a>{{/date_consented}}
       </td>
+      <td>
+        {{#date_enrolled}}{{ enrolledDate }}{{/date_enrolled}}
+        {{^date_enrolled}}<i class="small">not&nbsp;yet</i>{{/date_enrolled}}
+      </td>
+      <td class="small">{{#changedDate}}{{ changedDate }}{{/changedDate}}{{^changedDate}}{{ createdDate }}{{/changedDate}}</td>
       <td class="action">
         <a href="javascript:void(0);" onclick="showQRCode('{{ sssid }}')"{{^date_consented}} class="inactive"{{/date_consented}}><i class="fa fa-qrcode"></i></a>
       </td>
