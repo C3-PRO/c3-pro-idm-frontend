@@ -28,7 +28,7 @@ exports.getQRCode = function(opt, func) {
 	exports.getJWTForLink(opt, function(data, opt) {
 		if ('body' in data) {
 			qrCodeForJWT(data.body, function(path, error) {
-                data.qrcode = path;
+                data.body = path;
                 data.errorMessage = error;
                 func(data, opt);
             });

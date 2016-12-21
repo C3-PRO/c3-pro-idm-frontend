@@ -10,7 +10,7 @@ block content
         th Name
         th Created
         th Updated
-        th
+        th Consented
         th 
         th 
 
@@ -20,7 +20,7 @@ block content
           p Loading subjects...
 
   script(id='tmpl_row', type='x-tmpl-mustache').
-    <tr>
+    <tr id="row_{{ sssid }}">
       <td class="subject_status">
         <div class="status{{ status }}"></div><br>
         {{ human_status }}
@@ -34,10 +34,11 @@ block content
       <td class="small">{{ createdDate }}</td>
       <td class="small">{{ changedDate }}</td>
       <td class="action">
-        <a href="javascript:void(0);" onclick="showQRCode('{{ sssid }}')"><i class="fa fa-qrcode"></i></a>
+        {{#date_consented}}{{ consentedDate }}{{/date_consented}}
+        {{^date_consented}}<a href="javascript:void(0);" onclick="markConsented('{{ sssid }}')">record<br>consent</a>{{/date_consented}}
       </td>
       <td class="action">
-        <a href="/mail/\#{{ sssid }}"><i class="fa fa-envelope{{#status}}-o{{/status}}"></i></a>
+        <a href="javascript:void(0);" onclick="showQRCode('{{ sssid }}')"{{^date_consented}} class="inactive"{{/date_consented}}><i class="fa fa-qrcode"></i></a>
       </td>
       <td class="action">
         <a href="/subjects/{{ sssid }}"><i class="fa fa-pencil"></i></a>

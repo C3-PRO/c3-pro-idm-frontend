@@ -77,7 +77,7 @@ router.get('/:id', function(req, res, next) {
         };
         
         // we use "0" to indicate that we want to create a new subject
-        if (0 !== req.params.id) {
+        if ('0' !== req.params.id) {
             service.getSubject(opt, callback);
         }
         else {
@@ -92,7 +92,7 @@ router.get('/:id', function(req, res, next) {
 
 
 /**
- *  Update subject
+ *  Update subject.
  */
 router.post('/:id', function(req, res, next) {
     if (req.session.token) {
@@ -143,8 +143,34 @@ router.post('/:id', function(req, res, next) {
 
 
 /**
+ *  Mark the subject consented as of right now (JSON response).
+ */
+router.get('/:id/didConsent', function(req, res, next) {
+    var sess = req.session;
+    var token = sess.token;
+    if (sess.token) {
+        var opt = {
+            token: token,
+            sssid: req.params.id,
+            sess: sess,
+            res: res,
+        };
+        service.markSubjectConsented(opt, function(data, opt) {
+            opt.res.json(data);
+        });
+    }
+    else {
+        res.status(401).json({
+            errorMessage: "Unauthorized",
+            status: 401,
+        });
+    }
+})
+
+
+/**
  *  GET one QR code for a subject; picks an existing one if it hasn't expired
- *  yet, if there is none creates a new one.
+ *  yet, if there is none creates a new one (JSON response).
  */
 router.get('/:id/qrcode', function(req, res, next) {
     var sess = req.session;
@@ -185,18 +211,26 @@ router.get('/:id/qrcode', function(req, res, next) {
                 else {
                     console.log('---- creating new QR code')
                     service.createSubjectLink(opt, function(data, opt) {
-                        console.log('---- service.createSubjectQRCode()', data);
-                        // TODO: check for error
-                        callback(opt, data.body._id);
+                        console.log('---- service.createSubjectLink()', data);
+                        if (data.body) {
+                            callback(opt, data.body._id);
+                        }
+                        else if (data.statusCode == 401) {
+                            forceLogin(opt.sess, opt.res, '/subjects/'+opt.sssid);
+                        }
+                        else {
+                            opt.res.json({
+                                errorMessage: data.error || "Failed to create link",
+                                status: data.statusCode,
+                            });
+                        }
                     });
                 }
             }
             else {
-                var err = data.error || "Error retrieving subject";
                 opt.res.json({
-                    errorMessage: err,
+                    errorMessage: data.error || "Error retrieving subject",
                     status: data.statusCode,
-                    destination: '/subjects',
                 });
             }
         });

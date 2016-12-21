@@ -67,6 +67,22 @@ exports.updateSubject = function(opt, subject, func) {
     });
 }
 
+exports.markSubjectConsented = function(opt, func) {
+    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/didConsent', 'PUT');
+    options.headers["Content-Type"] = "application/json";
+    
+    request(options, function(error, response, body) {
+        console.log('services/subjects/markSubjectConsented:', body);
+        // TODO: refactor `dataBodyOrErrorFromJSONResponse` to return "data", not "body"
+        var data = config.dataBodyOrErrorFromJSONResponse(error, response, body);
+        if ('body' in data && data.body) {
+            manipulateSubjectData(data.body.data);
+        }
+        console.log('services/subjects/markSubjectConsented:', data);
+        func(data, opt);
+    });
+}
+
 exports.getSubjectLinks = function(opt, func) {
     var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/links', 'GET');
     options.headers["Accept"] = "application/json";
@@ -109,17 +125,17 @@ function manipulateSubjectData(subject) {
 }
 
 function setSubjectStatusString(subject) {
-    if (undefined === subject.status) {
-        subject.status = 0;
+    if (subject.date_withdrawn) {
+        subject.human_status = "Withdrawn";
     }
-    if (1 == subject.status) {
-        subject.human_status = "Invited";
-    }
-    else if (2 == subject.status) {
+    else if (subject.date_enrolled) {
         subject.human_status = "Enrolled";
     }
-    else if (3 == subject.status) {
-        subject.human_status = "Withdrawn";
+    else if (subject.date_consented) {
+        subject.human_status = "Consented";
+    }
+    else if (subject.date_invited) {
+        subject.human_status = "Invited";
     }
     else {
         subject.human_status = "Pending";
@@ -132,6 +148,18 @@ function formatSubjectDates(subject) {
     }
     if (subject.changed) {
         subject.changedDate = moment(subject.changed * 1000).calendar();
+    }
+    if (subject.date_invited) {
+        subject.invitedDate = moment(subject.date_invited * 1000).calendar();
+    }
+    if (subject.date_consented) {
+        subject.consentedDate = moment(subject.date_consented * 1000).calendar();
+    }
+    if (subject.date_enrolled) {
+        subject.enrolledDate = moment(subject.date_enrolled * 1000).calendar();
+    }
+    if (subject.date_withdrawn) {
+        subject.withdrawnDate = moment(subject.date_withdrawn * 1000).calendar();
     }
 }
 

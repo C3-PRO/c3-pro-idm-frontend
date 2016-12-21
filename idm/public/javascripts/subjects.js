@@ -50,10 +50,33 @@ function loadSubjectsData(searchstring, start, batch, success, error) {
 	});
 }
 
+function markConsented(sssid) {
+	$.getJSON('/subjects/'+sssid+'/didConsent', function(json, status, req) {
+		if ('body' in json && json.body && 'data' in json.body) {
+			var template = $('#tmpl_row').html();
+			var rendered = Mustache.render(template, json.body.data);
+			$('#row_'+sssid).replaceWith(rendered);
+		}
+		else {
+			console.error('markConsented() error:', status, json);
+			alert(('errorMessage' in json) ? json.errorMessage : "Failed to mark subject as consented");
+		}
+	})
+	.fail(function(req, status, error) {
+		console.error('markConsented() failed:', status, error);
+		if (401 == req.status) {
+			provokeLogin('/subjects');
+		}
+		else {
+			alert(error);
+		}
+	});
+}
+
 function showQRCode(sssid) {
 	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {
-		if ('qrcode' in json && json.qrcode) {
-			showBlackout(qrCodeOverlay(json.qrcode));
+		if ('body' in json && json.body) {
+			showBlackout(qrCodeOverlay(json.body));
 		}
 		else {
 			console.error('showQRCode() error:', status, json);

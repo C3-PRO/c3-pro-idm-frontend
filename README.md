@@ -4,6 +4,7 @@ C3PRO-IDM-FRONTEND is a web-based application that implements a simple Identity 
 
 The system manages PHI data, and it's supposed to run in a site's intranet. The system does not access directly any database. Data access is wrapped through [C3PRO-IDM_SERVICE](https://bitbucket.org/ihlchip/c3pro-idm-service) system, which publishes a secured API for this purpose.
 
+
 # Configuration and Deployment #
 
 ## Dependencies ##
@@ -28,6 +29,8 @@ The following command installs all the packages listed in **idm/package.json**
 #!shell
 $PROJECT_HOME/idm/npm install
 ```
+
+> **Note** that _node-qrcode_ builds _node-canvas_, which requires `Cairo` to be present on the system.
 
 ## Starting the server ##
 

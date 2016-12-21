@@ -6,11 +6,18 @@
 .pure-table .subject_name {
 	font-weight: bold;
 }
+.pure-table td {
+	line-height: 1.3;
+}
 .pure-table td.sssid,
 .pure-table td.action,
 .pure-table td.message {
-	font-size: 1.5em;
 	text-align: center; vertical-align: middle;
+}
+.pure-table td.sssid,
+.pure-table td.action i,
+.pure-table td.message {
+	font-size: 1.5em;
 }
 .pure-table td.message {
 	padding: 2em;
@@ -58,4 +65,7 @@
 }
 .error {
 	color: #900;
+}
+.inactive, a.inactive, a.inactive:hover, a.inactive:visited {
+	color: #999;
 }
