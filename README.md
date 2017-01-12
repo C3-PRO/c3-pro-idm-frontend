@@ -17,9 +17,7 @@ The system runs on **Node.js** and uses **npm** to start the server. To install 
 
     sudo apt-get clean
     sudo apt-get update
-    sudo apt-get -y install nodejs
-    sudo apt-get -y install npm
-    sudo apt-get -y install nodejs-legacy
+    sudo apt-get -y install pkg-config nodejs nodejs-legacy npm
 
 ## Installing Node.js dependencies ##
 
@@ -30,7 +28,21 @@ The following command installs all the packages listed in **idm/package.json**
 $PROJECT_HOME/idm/npm install
 ```
 
-> **Note** that _node-qrcode_ builds _node-canvas_, which requires `Cairo` to be present on the system.
+> **Note** that _node-qrcode_ builds _node-canvas_, which requires `Cairo` to be present on the system:
+>     sudo apt-get install -y libcairo2-dev libjpeg-dev libgif-dev
+
+## HTTPS ##
+
+We set up letsencrypt before starting nginx using a standalone cert server.
+[See here](https://certbot.eff.org/#ubuntuxenial-nginx) for documentation.
+
+    apt-get install letsencrypt
+    letsencrypt certonly --standalone -d your.domain.io
+
+If you're using Nginx, just drop the file `nginx-site.c3-pro-idm-frontend` into the machine's `/etc/nginx/sites-enabled/` folder _after adjusting_ `your.domain.io` to your (sub)domain.
+
+Don't forget that letsencrypt certificates expire pretty frequently.
+You should set up _systemd_ or something similar to once or twice daily attempt renewal using `letsencrypt renew` or `certbot renew`.
 
 ## Starting the server ##
 
