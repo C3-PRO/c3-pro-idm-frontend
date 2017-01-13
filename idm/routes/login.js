@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var config = require('../utils.js');
-//var service = require('../services/oauth');
-var service = require('../services/jwt');
+//var service_oauth = require('../services/oauth');
+var service_jwt = require('../services/jwt');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -24,8 +24,8 @@ router.post('/', function(req, res, next) {
         "res": res,
     };
     // TODO: check config to decide between OAuth2 or JWT
-    //service.oauth(opt, function(username, token, sess) {
-    service.jwt(opt, function(username, token, sess) {
+    //service_oauth.oauth(opt, function(username, token, sess) {
+    service_jwt.jwt(opt, function(username, token, sess) {
         sess.username = username;
         sess.token = token;
         console.log('token: ', token);

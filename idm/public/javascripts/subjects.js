@@ -5,12 +5,15 @@
 
 /**
 Get `num` most recently worked on subjects.
+
+TODO: this means globally changed subjects, should track per user.
 */
 function getRecentSubjects(num, callback) {
-	loadSubjectsData(null, 0, num || 3, 'changed', 'DESC',
+	var use_num = num || 3;
+	loadSubjectsData(null, 0, use_num+1, 'changed', 'DESC',
 		function(data) {
 			var tbl = $('#recent');
-			var num = renderSubjectsInto(data, tbl);
+			var num = renderSubjectsInto(data, tbl, use_num);
 			if (0 == num) {
 				var td = tbl.find('.loading').empty();
 				td.append('<p>No subjects</p>');
@@ -75,18 +78,18 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	});
 }
 
-function renderSubjectsInto(data, table) {
-	var i = 0;
+function renderSubjectsInto(data, table, max) {
 	var template = $('#tmpl_row').html();
 	Mustache.parse(template);
 	if (data.length > 0) {
 		var tbody = table.empty();
-		for (; i < data.length; i++) {
+		var stop = (max > 0) ? Math.min(max, data.length) : data.length;
+		for (var i = 0; i < stop; i++) {
 			var rendered = Mustache.render(template, data[i]);
 			tbody.append(rendered);
 		}
 	}
-	return i+1;
+	return data.length;
 }
 
 function markConsented(sssid) {
