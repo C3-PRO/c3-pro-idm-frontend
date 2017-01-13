@@ -53,15 +53,6 @@ The following command starts the web server on port 8080
 $PROJECT_HOME/idm/npm start
 ```
 
-To have the server auto-restart on file changes – useful during development – use `nodemon`:
-
-```
-cd idm
-nodemon app.js
-```
-
-(Install _nodemon_ like so: `npm install -g nodemon`)
-
 ## Deployment modes ##
 
 The system can be deployed in the following environments: *test*, *dev*, *qa*, *prod*. It is determined by the value of the system environment variable *NODE_ENV*. For instance, to run the server in production:
@@ -73,15 +64,29 @@ $PROJECT_HOME/idm/npm start
 ```
 
 If *NODE_ENV* is not defined, the application runs in *dev*.
-For development purposes, you may want to use **supervisor** to run the app so it gets restarted automatically when you save files.
+For development purposes, you may want to use **nodemon** (or _node-supervisor_) to have the server auto-restart on file changes:
 
 ```
 #!shell
 cd $PROJECT_HOME/idm
-supervisor app.js
+nodemon app.js
 ```
 
-## Property files
+(Install _nodemon_ like so: `npm install -g nodemon`)
+
+### Production
+
+You can let _supervisor_ take care of running the app on production systems.
+Copy the file `supervisor.c3-pro-idm-frontend.conf` to `/etc/supervisor/conf.d/c3-pro-idm-frontend.conf` and reload supervisor:
+
+    apt-get install -y supervisor
+    systemctl enable supervisor.service
+    systemctl start supervisor
+    
+    cp supervisor.c3-pro-idm-frontend.conf /etc/supervisor/conf.d/c3-pro-idm-frontend.conf
+    supervisorctl reload
+
+## Property files ##
 
 Properties for each environment are defined in the following json files:
 
@@ -91,7 +96,7 @@ Properties for each environment are defined in the following json files:
 
 They specify the host, port, http protocol and end points of the C3PRO-IDM-SERVICE api methods. 
 
-## The test environment
+## The test environment ##
 
 This environment uses mock services and does not require access to C3PRO-IDM-SERVICE. Is it useful   for purely front-end tests and fast demos. The data that appears there is written in static files in the following locations:
 
