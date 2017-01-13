@@ -69,21 +69,12 @@ exports.updateSubject = function(opt, subject, func) {
     request(options, function(error, response, body) {
         //console.log('services/subjects/updateSubject:', body);
         var json = config.dataOrErrorFromJSONResponse(error, response, body);
-        func(json, opt);
-    });
-}
-
-exports.markSubjectConsented = function(opt, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/didConsent', 'PUT');
-    options.headers["Content-Type"] = "application/json";
-    
-    request(options, function(error, response, body) {
-        //console.log('services/subjects/markSubjectConsented:', body);
-        var json = config.dataOrErrorFromJSONResponse(error, response, body);
-        if ('data' in json && json.data) {
-            manipulateSubjectData(json.data);
+        if ('error' in json) {
+            func(json, opt);
         }
-        func(json, opt);
+        else {
+            exports.getSubject(opt, func);
+        }
     });
 }
 

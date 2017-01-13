@@ -1,4 +1,5 @@
 var express = require('express');
+var moment = require('moment');
 var router = express.Router();
 var service = require('../services/subjects');
 var isodate = require('isodate');
@@ -143,13 +144,17 @@ router.get('/:id/didConsent', function(req, res, next) {
     var sess = req.session;
     var token = sess.token;
     if (sess.token) {
+        var subject = {
+            sssid: req.params.id,
+            date_consented: moment().format(),
+        };
         var opt = {
             token: token,
             sssid: req.params.id,
             sess: sess,
             res: res,
         };
-        service.markSubjectConsented(opt, function(data, opt) {
+        service.updateSubject(opt, subject, function(data, opt) {
             opt.res.json(data);
         });
     }
