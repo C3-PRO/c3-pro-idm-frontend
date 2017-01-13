@@ -90,6 +90,12 @@ function renderSubjectsInto(data, table) {
 }
 
 function markConsented(sssid) {
+	if (confirm("This will mark the subject as having completed consent.\n\nDo you want to record consent?")) {
+		doMarkConsented(sssid);
+	}
+}
+
+function doMarkConsented(sssid) {
 	$.getJSON('/subjects/'+sssid+'/didConsent', function(json, status, req) {
 		if ('data' in json && json.data) {
 			var template = $('#tmpl_row').html();
@@ -115,6 +121,9 @@ function showQRCode(sssid) {
 	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {
 		if ('data' in json && json.data) {
 			showBlackout(qrCodeOverlay(json.data));
+		}
+		else if ('statusCode' in json && 401 == json.statusCode) {
+			provokeLogin('/subjects');
 		}
 		else {
 			reportError(status, json, 'showQRCode() error:', "Could not retrieve QR code");
