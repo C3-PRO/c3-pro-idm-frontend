@@ -11,6 +11,9 @@ block content
     p
       button(type="submit")
         i.fa.fa-sign-in &nbsp;Log in
+    if forgot_password
+      p
+        a(href=forgot_password) I forgot my password
 
   if !(typeof errmessage === 'undefined')
     p.errormsg= errmessage

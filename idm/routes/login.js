@@ -11,7 +11,9 @@ router.get('/', function(req, res, next) {
     }
     else {
         var title = (config.app && config.app.login_title) ? config.app.login_title : 'IDM Login';
-        res.render('login', {title: title, destination: req.query.dest});
+        // TODO: decide between oauth and JWT
+        var forgot = config.jwt ? config.jwt.forgot_password : null
+        res.render('login', {title: title, destination: req.query.dest, forgot_password: forgot});
     }
 });
 
