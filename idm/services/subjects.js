@@ -10,6 +10,13 @@ var links_service = require('../services/links');
 var exports = module.exports = {};
 var app = express();
 
+
+// verify subjects endpoint config
+if (!config || !config.subjects || !config.subjects.host || !config.subjects.endpoint) {
+    throw Error('config.subjects is incomplete, need at least `host` and `endpoint`');
+}
+
+
 exports.getSubjects = function(opt, func) {
     var sssid = opt.sssid;
     var fullEndPoint = config.subjects.endpoint + '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
@@ -158,7 +165,7 @@ exports.getSubjectQRCode = function(opt, func) {
 
 function setBaseOptions(opt, endpoint, method) {
     var options = {
-        uri: config.subjects.protocol + "://" + config.subjects.host + ":" + config.subjects.port + endpoint,
+        uri: (config.subjects.protocol || 'https') + "://" + config.subjects.host + (config.subjects.port ? ':'+config.subjects.port  :'') + endpoint,
         method : method,
         headers: {
             'Authorization': config.subjects.token_type + ' ' + opt.token,

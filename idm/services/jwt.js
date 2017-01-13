@@ -8,14 +8,32 @@ var exports = module.exports = {};
 var app = express();
 
 exports.jwt = function(opt, func) {
-    var options = setBaseOptions(opt, config.jwt.endpoint, 'POST');
+    var support = config.app && config.app.support ? (': ' + config.app.support) : '';
+    var login_title = config.app ? config.app.login_title : null;
+    if (!('jwt' in config) || !config.jwt.host || !config.jwt.endpoint) {
+        opt.res.render('login', {
+            title: login_title,
+            username: opt.username,
+            errmessage: "The JWT login process has not been configured appropriately, please contact an admin" + support + '.',
+        });
+        return;
+    }
+    var options = {
+        uri: (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '') + config.jwt.endpoint,
+        method: 'POST',
+        json: true,
+        body: {
+            username: opt.username,
+            password: opt.password,
+        },
+    }
     console.log('JWT request:  ', options.uri);
     request(options, function(error, response, body) {
         console.log('JWT response: ', response ? response.statusCode : null);
         if (response) {
             if (response.statusCode == 401) {
                 opt.res.render('login', {
-                    title: 'IDM',
+                    title: login_title,
                     username: opt.username,
                     errmessage: "Wrong credentials. Please, try again."
                 });
@@ -23,7 +41,7 @@ exports.jwt = function(opt, func) {
             }
             if (response.statusCode >= 400) {
                 opt.res.render('login', {
-                    title: 'IDM',
+                    title: login_title,
                     username: opt.username,
                     errmessage: "HTTP error code:" + response.statusCode
                 });
@@ -35,25 +53,11 @@ exports.jwt = function(opt, func) {
                 return;
             }
         }
-        var support = 'support' in config.app ? ('at ' + config.app.support) : null;
         opt.res.render('login', {
-            title: 'IDM',
+            title: login_title,
             username: opt.username,
-            errmessage: "No response from authorization server, please contact an admin " + support + '.',
+            errmessage: "No response from authorization server, please contact an admin" + support + '.',
         });
     });
-}
-
-function setBaseOptions(opt, endpoint, method) {
-    var options = {
-        uri: config.jwt.protocol + "://" + config.jwt.host + ":" + config.jwt.port + endpoint,
-        method: method,
-        json: true,
-        body: {
-            username: opt.username,
-            password: opt.password,
-        },
-    }
-    return options;
 }
 

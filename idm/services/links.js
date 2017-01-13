@@ -6,6 +6,12 @@ var exports = module.exports = {};
 var app = express();
 
 
+// verify links endpoint config
+if (!config || !config.links || !config.links.host || !config.links.endpoint) {
+    throw Error('config.links is incomplete, need at least `host` and `endpoint`');
+}
+
+
 exports.getJWTForLink = function(opt, func) {
 	if (!('jti' in opt) || !opt.jti) {
 		var data = {errorMessage: "No `jti` provided on `opt` parameter passed into `getJWTForLink()`"};
@@ -61,7 +67,7 @@ function setBaseOptions(opt, endpoint, method) {
         uri: config.links.protocol + '://' + config.links.host + ':' + config.links.port + endpoint,
         method : method,
         headers: {
-            'Authorization': config.links.token_type + ' ' + opt.token,
+            'Authorization': (config.links.token_type || 'Bearer') + ' ' + opt.token,
         }
     }
     return options;

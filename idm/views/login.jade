@@ -1,7 +1,7 @@
 extends layoutout
 
 block content
-  h2= title
+  h2= title || "IDM"
   form(action="/login", method="POST")
     input.form-control(name="destination", type="hidden", value=destination)
     p
