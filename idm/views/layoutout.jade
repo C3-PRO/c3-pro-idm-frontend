@@ -1,7 +1,8 @@
 doctype html
 html
+  block vars
   head
-    title= title
+    title= title || "IDM"
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
@@ -16,8 +17,4 @@ html
       div.container.login
         block content
     footer
-      .center
-      p
-        a(href="http://www.chip.org")
-          img.institute(src="/images/ResearchInstitute-web.png", srcset="/images/ResearchInstitute-web@2x.png 2x, /images/ResearchInstitute-web@3x.png 3x", alt="")
-      p Copyright © Boston Children's Hospital / University Hospital Zurich 2017
+      include footer

@@ -1,11 +1,14 @@
 extends layout
 
+block vars
+  - var title = "IDM: " + subject.name
+
 block content
   div.subject
     if (sssid == 0)
       h2 New Subject
     else
-      h2 Update Subject Information
+      h2= "Update " + subject.name || "Subject"
     form(action="/subjects/#{sssid}", method="POST")
     
       p SSSID *:

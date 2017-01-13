@@ -1,5 +1,8 @@
 extends layout
 
+block vars
+  - var title = "IDM: Subjects"
+
 block content
   h1 Recent Subjects
   table.pure-table
@@ -47,8 +50,9 @@ block content
       <td class="sssid">{{ sssid }}</td>
       <td>
         <div class="subject_name">{{ name }}</div>
-        {{#email}}<a class="small" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
-        {{^email}}<i class="small">no&nbsp;email</i>{{/email}}
+        {{#bday}}<i class="small">{{ bday }}</i>{{/bday}}
+        <!--{{#email}}<a class="small" href="mailto:{{ email }}">{{ email }}</a>{{/email}}
+        {{^email}}<i class="small">no&nbsp;email</i>{{/email}}-->
       </td>
       <td>
         {{#date_consented}}{{ consentedDate }}{{/date_consented}}
