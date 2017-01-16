@@ -10,10 +10,14 @@ router.get('/', function(req, res, next) {
         res.redirect('/subjects');
     }
     else {
-        var title = (config.app && config.app.login_title) ? config.app.login_title : 'IDM Login';
+        var title = config.app ? config.app.login_title : null;
         // TODO: decide between oauth and JWT
-        var forgot = config.jwt ? config.jwt.forgot_password : null
-        res.render('login', {title: title, destination: req.query.dest, forgot_password: forgot});
+        var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
+        var forgot = base + config.jwt.forgot_password;
+        res.render('login', {
+            title: title,
+            destination: req.query.dest,
+            forgot_password: forgot});
     }
 });
 
@@ -27,11 +31,23 @@ router.post('/', function(req, res, next) {
     };
     // TODO: check config to decide between OAuth2 or JWT
     //service_oauth.oauth(opt, function(username, token, sess) {
-    service_jwt.jwt(opt, function(username, token, sess) {
-        sess.username = username;
-        sess.token = token;
-        console.log('token: ', token);
-        res.redirect(req.body.destination ? req.body.destination : '/subjects');
+    service_jwt.jwt(opt, function(username, token, sess, error) {
+        if (error) {
+            var title = config.app ? config.app.login_title : null;
+            var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
+            var forgot = base + config.jwt.forgot_password;
+            res.render('login', {
+                title: title,
+                destination: req.body.destination,
+                username: username,
+                errmessage: error,
+                forgot_password: forgot});
+        }
+        else {
+            sess.username = username;
+            sess.token = token;
+            res.redirect(req.body.destination ? req.body.destination : '/subjects');
+        }
     });
 });
 

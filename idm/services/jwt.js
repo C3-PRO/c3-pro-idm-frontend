@@ -7,19 +7,25 @@ var config = require('../utils.js');
 var exports = module.exports = {};
 var app = express();
 
+
+/**
+Attempts to retrieve a token by querying a JWT endpoint.
+
+The return function has 4 optional parameters, filled according to outcome:
+- username
+- token
+- session
+- error
+*/
 exports.jwt = function(opt, func) {
     var support = config.app && config.app.support ? (': ' + config.app.support) : '';
-    var login_title = config.app ? config.app.login_title : null;
     if (!('jwt' in config) || !config.jwt.host || !config.jwt.endpoint) {
-        opt.res.render('login', {
-            title: login_title,
-            username: opt.username,
-            errmessage: "The JWT login process has not been configured appropriately, please contact an admin" + support + '.',
-        });
+        func(opt.username, null, opt.sess, "The JWT login process has not been configured, please contact an admin" + support + '.');
         return;
     }
+    var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
     var options = {
-        uri: (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '') + config.jwt.endpoint,
+        uri: base + config.jwt.endpoint,
         method: 'POST',
         json: true,
         body: {
@@ -32,32 +38,19 @@ exports.jwt = function(opt, func) {
         console.log('JWT response: ', response ? response.statusCode : null);
         if (response) {
             if (response.statusCode == 401) {
-                opt.res.render('login', {
-                    title: login_title,
-                    username: opt.username,
-                    errmessage: "Wrong credentials. Please, try again."
-                });
+                func(opt.username, null, opt.sess, "Wrong credentials. Please, try again.");
                 return;
             }
             if (response.statusCode >= 400) {
-                opt.res.render('login', {
-                    title: login_title,
-                    username: opt.username,
-                    errmessage: "HTTP error code:" + response.statusCode
-                });
+                func(opt.username, null, opt.sess, "HTTP error code:" + response.statusCode);
                 return;
             }
             if (body && 'access_token' in body) {
-                var token = body.access_token;
-                func(opt.username, token, opt.sess);
+                func(opt.username, body.access_token, opt.sess);
                 return;
             }
         }
-        opt.res.render('login', {
-            title: login_title,
-            username: opt.username,
-            errmessage: "No response from authorization server, please contact an admin" + support + '.',
-        });
+        func(opt.username, null, opt.sess, "No response from authorization server, please contact an admin" + support + '.');
     });
 }
 

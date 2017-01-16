@@ -27,7 +27,7 @@ function getRecentSubjects(num, callback) {
 			}
 			else {
 				var detail = (error && 'errorMessage' in error) ? '<p>'+error.errorMessage+'</p>' : '';
-				$('#recent .loading').html('<p class="error">Failed getting recent subjects</p>'+detail);
+				$('#recent .loading').html('<p class="error">Failed retrieving recent subjects</p>'+detail);
 			}
 		}
 	);
@@ -46,7 +46,7 @@ function getSubjects(searchstring, start, batch) {
 				}
 				else {
 					var detail = ('message' in error) ? '<p>'+error['message']+'</p>' : '';
-					$('#loading').html('<p class="error">Failed getting subjects</p>'+detail);
+					$('#loading').html('<p class="error">Failed retrieving subjects</p>'+detail);
 				}
 			}
 		}

@@ -29,7 +29,7 @@
     "port": 9096,
     "protocol": "http",
     "endpoint": "/auth",
-    "forgot_password": "//idm.c3-pro.io/iforgot"
+    "forgot_password": "/iforgot"
   },
   "mail": {
     "host": "127.0.0.1",
