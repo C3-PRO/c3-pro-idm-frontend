@@ -115,6 +115,9 @@ function treatedSubjectData(data) {
 	return data;
 }
 
+
+// MARK: - Consenting
+
 function markConsented(sssid) {
 	if (confirm("This will mark the subject as having completed consent.\n\nDo you want to record consent?")) {
 		doMarkConsented(sssid);
@@ -142,6 +145,9 @@ function doMarkConsented(sssid) {
 		}
 	});
 }
+
+
+// MARK: - QR Code
 
 function showQRCode(sssid) {
 	$.getJSON('/subjects/'+sssid+'/qrcode', function(json, status, req) {

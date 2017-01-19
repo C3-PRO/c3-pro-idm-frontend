@@ -1,8 +1,9 @@
 var express = require('express');
 var moment = require('moment');
 var router = express.Router();
+var config = require('../utils.js');
 var service = require('../services/subjects');
-var isodate = require('isodate');
+var data = require('../services/data');
 
 
 router.get('/api/:page/:perpage/:ordercol/:orderdir', function(req, res, next) {
@@ -57,6 +58,7 @@ router.get('/:id', function(req, res, next) {
                 opt.res.render('subject', {
                     sssid: opt.sssid,
                     subject: json.data,
+                    data_to_add: config.data ? config.data.items : null,
                 });
             }
             else if (json.statusCode == 401) {
@@ -142,14 +144,13 @@ router.post('/:id', function(req, res, next) {
  */
 router.get('/:id/didConsent', function(req, res, next) {
     var sess = req.session;
-    var token = sess.token;
     if (sess.token) {
         var subject = {
             sssid: req.params.id,
             date_consented: moment().format(),
         };
         var opt = {
-            token: token,
+            token: sess.token,
             sssid: req.params.id,
             sess: sess,
             res: res,
@@ -173,10 +174,9 @@ router.get('/:id/didConsent', function(req, res, next) {
  */
 router.get('/:id/qrcode', function(req, res, next) {
     var sess = req.session;
-    var token = sess.token;
     if (sess.token) {
         var opt = {
-            token: token,
+            token: sess.token,
             sssid: req.params.id,
             sess: sess,
             res: res,
@@ -193,6 +193,32 @@ router.get('/:id/qrcode', function(req, res, next) {
     }
 });
 
+
+/**
+ *  Accepts additional data to associate with a given subject link, i.e. this
+ *  data will be associated the link's id and sent to the link's endpoint,
+ *  expected to be a FHIR endpoint.
+ */
+router.post('/:id/addData', function(req, res, next) {
+    if (req.session.token) {
+        var opt = {
+            token: req.session.token,
+            sssid: req.params.id,
+            data: req.body.data,
+            sess: req.session,
+            res: res,
+        };
+        data.addResearchData(opt, function(json, opt) {
+            opt.res.json(json);
+        });
+    }
+    else {
+        res.status(401).json({
+            errorMessage: "Unauthorized",
+            statusCode: 401,
+        });
+    }
+})
 
 /**
  *  GET home page - redirect to 'subjects'

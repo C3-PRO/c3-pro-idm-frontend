@@ -1,9 +1,7 @@
-var express = require('express');
 var request = require('request');
 var config = require('../utils.js');
 var QRCode = require('qrcode');
 var exports = module.exports = {};
-var app = express();
 
 
 // verify links endpoint config

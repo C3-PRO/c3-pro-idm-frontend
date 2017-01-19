@@ -11,6 +11,17 @@
     "endpoint": "/subject",
     "token_type": "JWT"
   },
+  "data": {
+    "base": "stu3",
+    "items": [{
+        "id": "hcv-rna",
+        "type": "ObservationQuantity",
+        "system": "http://loinc.org",
+        "code": "???",
+        "humanDisplay": "HCV-RNA level in serum or plasma",
+        "unit": "[IU]/mL"
+    }]
+  },
   "links": {
     "host": "127.0.0.1",
     "port": 9096,

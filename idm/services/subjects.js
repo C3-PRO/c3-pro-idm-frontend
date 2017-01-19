@@ -3,7 +3,6 @@ API wrapper to get enrolled subjects
  */
 var express = require('express');
 var request = require('request');
-var async = require('async');
 var moment = require('moment');
 var config = require('../utils.js');
 var links_service = require('../services/links');

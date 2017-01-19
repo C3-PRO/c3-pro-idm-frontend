@@ -5,39 +5,62 @@ block vars
 
 block content
   div.subject
-    if (sssid == 0)
+    if 0 == sssid
       h2 New Subject
     else
       h2= "Update " + subject.name || "Subject"
-    form(action="/subjects/#{sssid}", method="POST")
     
-      p SSSID *:
-      p
-        input.form-control(name="sssid", type="text", value=subject.sssid)
-      p Name:
-      p
-        input.form-control(name="name", type="text", value=subject.name)
-      p
-      p Birthdate * (YEAR-MM-DD):
-      p
-        input.form-control(name="bday", type="date", value=subject.bday)
-      p
-      p Email Address:
-      p
-        input.form-control(name="email", type="email", value=subject.email)
-      p
-        button(type="submit")
-          if (sssid == 0)
-            i.fa.fa-save &nbsp;Create
-          else
-            i.fa.fa-save &nbsp;Update
-        button(onclick="cancel();return false;")
-          i.fa.fa-stop &nbsp;Cancel
+    if !(typeof errorMessage === 'undefined')
+      p.errormsg= errorMessage
+    
+    form(action="/subjects/#{sssid}", method="POST")
+      table.subject-table
+        tbody
+          tr
+            th SSSID *:
+            td(style="min-width:20em;")
+              if subject.sssid
+                span.subject_sssid= sssid
+              else
+                input.form-control(name="sssid", type="text", value=subject.sssid)
+          tr
+            th Name:
+            td.subject_name
+              input.form-control(name="name", type="text", value=subject.name)
+          tr
+            th Birthdate *:<br>
+              span.small (YEAR-MM-DD)
+            td
+              input.form-control(name="bday", type="date", value=subject.bday)
+          tr
+            th Email Address:
+            td
+              input.form-control(name="email", type="email", value=subject.email)
+          tr
+            th
+            td
+              button(type="submit")
+                if 0 == sssid
+                  i.fa.fa-save &nbsp;Create
+                else
+                  i.fa.fa-save &nbsp;Update
+              button(onclick="cancel();return false;")
+                i.fa.fa-stop &nbsp;Cancel
+    
+    if data_to_add && data_to_add
+      hr
+      h2 Add Research Data
+      each item in data_to_add
+        p
+          h3= item.humanDisplay
+          b= item.id
 
-      if !(typeof errorMessage === 'undefined')
-        p.errormsg= errorMessage
+      button(onclick='addResearchData("#{sssid}")')
+        i.fa.fa-save &nbsp;Add
 
-      script.
-        function cancel() {
-          window.location.href = '/subjects'
-        }
+block scripts
+  script(src="/javascripts/subject.js")
+  script.
+    function cancel() {
+      window.location.href = '/subjects'
+    }

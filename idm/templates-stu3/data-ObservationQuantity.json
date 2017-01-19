@@ -1,0 +1,21 @@
+{
+  "resourceType": "Observation",
+  "subject": {
+    "reference": "Patient/{{sssid}}"
+  },
+  "code": {
+    "coding": [{
+      "system": "{{system}}",
+      "code": "{{code}}",
+{{#display}}      "display": "{{display}}"{{/display}}
+    }],
+    "text": "{{humanDisplay}}"
+  },
+  "effectiveDateTime": "{{date}}",
+  "valueQuantity": {
+    "value": {{value}},
+    "unit": "{{unit}}",
+    "system": "http://unitsofmeasure.org",
+    "code": "{{unit}}"
+  }
+}
