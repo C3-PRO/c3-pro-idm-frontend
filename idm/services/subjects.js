@@ -83,7 +83,7 @@ exports.getSubjectLinks = function(opt, func) {
     options.headers["Accept"] = "application/json";
     
     request(options, function(error, response, body) {
-        console.log('services/subjects/getSubjectLinks:', body);
+        //console.log('services/subjects/getSubjectLinks:', body);
         var json = config.dataOrErrorFromJSONResponse(error, response, body);
         func(json, opt);
     });
@@ -117,7 +117,7 @@ exports.getSubjectQRCode = function(opt, func) {
             var callback = function(opt, jti) {
                 opt.jti = jti;
                 links_service.getQRCode(opt, function(sjson, opt) {
-                    console.log('services/subjects/getSubjectQRCode()/links_service.getQRCode()', sjson);
+                    //console.log('services/subjects/getSubjectQRCode()/links_service.getQRCode()', sjson);
                     opt.res.json(sjson);
                 });
             };
@@ -128,7 +128,7 @@ exports.getSubjectQRCode = function(opt, func) {
                 callback(opt, useLink._id);
             }
             else {
-                console.log('services/subjects/getSubjectQRCode(): creating new QR code')
+                //console.log('services/subjects/getSubjectQRCode(): creating new QR code')
                 exports.createSubjectLink(opt, function(cjson, opt) {
                     console.log('services/subjects/getSubjectQRCode().createSubjectLink()', cjson);
                     if (cjson.data) {
@@ -167,7 +167,7 @@ function setBaseOptions(opt, endpoint, method) {
 
 function manipulateSubjectData(subject) {
     setSubjectStatusString(subject);
-    formatSubjectDates(subject);
+    normalizeSubjectDates(subject);
 }
 
 function setSubjectStatusString(subject) {
@@ -193,24 +193,12 @@ function setSubjectStatusString(subject) {
     }
 }
 
-function formatSubjectDates(subject) {
+function normalizeSubjectDates(subject) {
     if (subject.created) {
-        subject.createdDate = moment(subject.created * 1000).calendar();
+        subject.date_created = moment(subject.created * 1000).format();
     }
     if (subject.changed) {
-        subject.changedDate = moment(subject.changed * 1000).calendar();
-    }
-    if (subject.date_invited) {
-        subject.invitedDate = moment(subject.date_invited).calendar();
-    }
-    if (subject.date_consented) {
-        subject.consentedDate = moment(subject.date_consented).calendar();
-    }
-    if (subject.date_enrolled) {
-        subject.enrolledDate = moment(subject.date_enrolled).calendar();
-    }
-    if (subject.date_withdrawn) {
-        subject.withdrawnDate = moment(subject.date_withdrawn).calendar();
+        subject.date_changed = moment(subject.changed * 1000).format();
     }
 }
 

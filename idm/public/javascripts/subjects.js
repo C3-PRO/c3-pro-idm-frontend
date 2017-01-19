@@ -85,11 +85,34 @@ function renderSubjectsInto(data, table, max) {
 		var tbody = table.empty();
 		var stop = (max > 0) ? Math.min(max, data.length) : data.length;
 		for (var i = 0; i < stop; i++) {
-			var rendered = Mustache.render(template, data[i]);
+			var treated = treatedSubjectData(data[i]);
+			var rendered = Mustache.render(template, treated);
 			tbody.append(rendered);
 		}
 	}
 	return data.length;
+}
+
+function treatedSubjectData(data) {
+	if (data.bday) {
+		data.birthDate = moment(data.bday).format('L');
+	}
+	if (data.date_changed) {
+        data.changedDate = moment(data.date_changed).format('lll');
+    }
+    if (data.date_invited) {
+        data.invitedDate = moment(data.date_invited).format('lll');
+    }
+    if (data.date_consented) {
+        data.consentedDate = moment(data.date_consented).format('lll');
+    }
+    if (data.date_enrolled) {
+        data.enrolledDate = moment(data.date_enrolled).format('lll');
+    }
+    if (data.date_withdrawn) {
+        data.withdrawnDate = moment(data.date_withdrawn).format('lll');
+    }
+	return data;
 }
 
 function markConsented(sssid) {
