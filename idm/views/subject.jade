@@ -8,7 +8,7 @@ block content
     if 0 == sssid
       h2 New Subject
     else
-      h2= "Update " + subject.name || "Subject"
+      h2= subject.name || "Subject"
     
     if !(typeof errorMessage === 'undefined')
       p.errormsg= errorMessage
@@ -24,12 +24,12 @@ block content
           tr
             th SSSID *:
             td(style="min-width:20em;")
-              if subject.sssid
+              if 0 != sssid
                 span.subject_sssid= sssid
               else
                 input.form-control(name="sssid", type="text", value=subject.sssid)
           tr
-            th Name:
+            th Name *:
             td.subject_name
               input.form-control(name="name", type="text", value=subject.name)
           tr
@@ -53,7 +53,7 @@ block content
               button(onclick="cancel();return false;")
                 i.fa.fa-stop &nbsp;Cancel
     
-    if data_to_add && data_to_add
+    if subject.status > 0 && subject.status < 3 && data_to_add
       hr
       h2 Add Research Data
       table#research-data.subject-table

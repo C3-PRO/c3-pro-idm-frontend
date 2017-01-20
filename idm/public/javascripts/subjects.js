@@ -128,7 +128,8 @@ function doMarkConsented(sssid) {
 	$.getJSON('/subjects/'+sssid+'/didConsent', function(json, status, req) {
 		if ('data' in json && json.data) {
 			var template = $('#tmpl_row').html();
-			var rendered = Mustache.render(template, json.data);
+			var subject = treatedSubjectData(json.data);
+			var rendered = Mustache.render(template, subject);
 			$('.row_'+sssid).replaceWith(rendered);
 		}
 		else {
@@ -173,7 +174,7 @@ function showQRCode(sssid) {
 }
 
 function qrCodeOverlay(path) {
-	var img = $('<img src="'+path+'" alt="QR Code"/>');
+	var img = $('<img src="/'+path+'" alt="QR Code"/>');
 	var div = $('<div/>').addClass('qrpopover');
 	div.append(img);
 	img.click(removeBlackout);

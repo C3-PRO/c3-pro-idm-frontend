@@ -64,7 +64,7 @@ block content
       </td>
       <td class="small">{{#changedDate}}{{ changedDate }}{{/changedDate}}{{^changedDate}}{{ createdDate }}{{/changedDate}}</td>
       <td class="action">
-        <a href="javascript:void(0);" onclick="showQRCode('{{ sssid }}')"{{^date_consented}} class="inactive"{{/date_consented}}><i class="fa fa-qrcode"></i></a>
+        <a href="javascript:void(0);"{{#date_consented}} onclick="showQRCode('{{ sssid }}')"{{/date_consented}}{{^date_consented}} class="inactive"{{/date_consented}}><i class="fa fa-qrcode"></i></a>
       </td>
       <td class="action">
         <a href="/subjects/{{ sssid }}"><i class="fa fa-arrow-circle-right"></i></a>

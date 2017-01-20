@@ -56,7 +56,7 @@ router.get('/:id', function(req, res, next) {
         var callback = function(json, opt) {
             if (json.data) {
                 opt.res.render('subject', {
-                    sssid: opt.sssid,
+                    sssid: (0 == opt.sssid || '0' == opt.sssid) ? 0 : opt.sssid,
                     subject: json.data,
                     data_to_add: config.data ? config.data.items : null,
                 });
@@ -74,11 +74,11 @@ router.get('/:id', function(req, res, next) {
         };
         
         // we use "0" to indicate that we want to create a new subject
-        if ('0' !== req.params.id) {
-            service.getSubject(opt, callback);
+        if (0 == opt.sssid || '0' == opt.sssid) {
+            callback({data: {}}, opt);
         }
         else {
-            callback({data: {}}, opt);
+            service.getSubject(opt, callback);
         }
     }
     else {
@@ -94,7 +94,7 @@ router.get('/:id', function(req, res, next) {
 router.post('/:id', function(req, res, next) {
     if (req.session.token) {
         var subject = {
-            sssid: req.params.id,
+            sssid: req.body.sssid || req.params.id,
             name: req.body.name,
             bday: req.body.bday,
             email: req.body.email,
@@ -105,13 +105,13 @@ router.post('/:id', function(req, res, next) {
             sess: req.session,
             res: res,
         };
-        console.log('---- routes/subjects/:id, posted:', subject);
+        //console.log('---- routes/subjects/:id, posted:', subject);
         var callback = function(json, opt) {
-            console.log('---- routes/subjects/:id, received:', json);
+            //console.log('---- routes/subjects/:id, received:', json);
             if (json.data) {
                 opt.res.render('msg', {
-                    message: (opt.sssid == 0) ? "Subject Created" : "Data Updated",
-                    okref: '/subjects/'+req.params.id,
+                    message: (opt.sssid == 0) ? "Subject Created" : (req.body.name || "Data") + " Updated",
+                    okref: '/subjects/'+((opt.sssid == 0) ? '' : json.data.sssid),
                 })
             }
             else if (json.statusCode == 401) {

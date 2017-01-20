@@ -17,7 +17,6 @@ if (!config || !config.subjects || !config.subjects.host || !config.subjects.end
 
 
 exports.getSubjects = function(opt, func) {
-    var sssid = opt.sssid;
     var fullEndPoint = config.subjects.endpoint + '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
     if (typeof opt.status != 'undefined') {
         fullEndPoint = fullEndPoint + '&status=' + opt.status;
@@ -68,7 +67,7 @@ exports.updateSubject = function(opt, subject, func) {
     request(options, function(error, response, body) {
         //console.log('services/subjects/updateSubject:', body);
         var json = config.dataOrErrorFromJSONResponse(error, response, body);
-        if ('error' in json) {
+        if (json.errorMessage) {
             func(json, opt);
         }
         else {
@@ -103,14 +102,19 @@ exports.getSubjectQRCode = function(opt, func) {
     
     // get all Links for this subject and pick the first without `exp` expiration date, if any
     exports.getSubjectLinks(opt, function(json, opt) {
-        if (json.data) {
+        if (json.errorMessage) {
+             opt.res.json(json);
+        }
+        else {
             var useLink = null;
-            var now = Date();
-            for (var i = 0; i < json.data.length; i++) {
-                var exp = json.data[i].exp ? isodate(json.data[i].exp) : null;
-                if (!exp || exp > now) {
-                    useLink = json.data[i];
-                    break;
+            if (json.data) {
+                var now = moment();
+                for (var i = 0; i < json.data.length; i++) {
+                    var exp = json.data[i].exp ? moment(json.data[i].exp) : null;
+                    if (!exp || exp > now) {
+                        useLink = json.data[i];
+                        break;
+                    }
                 }
             }
             var callback = function(opt, jti) {
@@ -141,9 +145,6 @@ exports.getSubjectQRCode = function(opt, func) {
                     }
                 });
             }
-        }
-        else {
-            opt.res.json(json);
         }
     });
 }
