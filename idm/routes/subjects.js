@@ -94,7 +94,7 @@ router.get('/:id', function(req, res, next) {
 router.post('/:id', function(req, res, next) {
     if (req.session.token) {
         var subject = {
-            sssid: req.body.sssid,
+            sssid: req.params.id,
             name: req.body.name,
             bday: req.body.bday,
             email: req.body.email,
@@ -105,12 +105,13 @@ router.post('/:id', function(req, res, next) {
             sess: req.session,
             res: res,
         };
+        console.log('---- routes/subjects/:id, posted:', subject);
         var callback = function(json, opt) {
-            console.log('---- routes/subjects/(update|new)Subject:', json);
+            console.log('---- routes/subjects/:id, received:', json);
             if (json.data) {
                 opt.res.render('msg', {
                     message: (opt.sssid == 0) ? "Subject Created" : "Data Updated",
-                    okref: '/subjects'
+                    okref: '/subjects/'+req.params.id,
                 })
             }
             else if (json.statusCode == 401) {

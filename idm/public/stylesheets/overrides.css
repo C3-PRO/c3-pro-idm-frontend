@@ -19,7 +19,7 @@ h1:first-child {
 .pure-table .subject_name {
 	font-weight: bold;
 }
-.subject-table tbody th {
+.subject-table tbody th, .subject-table tfoot th {
 	text-align: right;
 }
 .pure-table td, .pure-table th, .subject-table td, .subject-table th {
@@ -49,7 +49,7 @@ h1:first-child {
 .pure-table td.subject_status {
 	text-align: center; vertical-align: middle;
 }
-.pure-table td.subject_status > div {
+td.subject_status > div {
 	display: inline-block;
 	width: 1em; height: 1em;
 	font-size: 0.8em; line-height: 1.5;
@@ -91,6 +91,9 @@ h1:first-child {
 }
 .error {
 	color: #900;
+}
+.success {
+	color: #5A2; font-weight: bold;
 }
 .inactive, a.inactive, a.inactive:hover, a.inactive:visited {
 	color: #999;

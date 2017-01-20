@@ -16,6 +16,11 @@ block content
     form(action="/subjects/#{sssid}", method="POST")
       table.subject-table
         tbody
+          if 0 != sssid
+            tr
+              td.subject_status(style="text-align:right;")
+                div(class="status#{subject.status}")
+              td= subject.human_status
           tr
             th SSSID *:
             td(style="min-width:20em;")
@@ -36,6 +41,7 @@ block content
             th Email Address:
             td
               input.form-control(name="email", type="email", value=subject.email)
+        tfoot
           tr
             th
             td
@@ -50,13 +56,21 @@ block content
     if data_to_add && data_to_add
       hr
       h2 Add Research Data
-      each item in data_to_add
-        p
-          h3= item.humanDisplay
-          b= item.id
-
-      button(onclick='addResearchData("#{sssid}")')
-        i.fa.fa-save &nbsp;Add
+      table#research-data.subject-table
+        tbody
+        each item in data_to_add
+          tr
+            th= item.humanDisplay
+            td
+              input.form-control(id="#{item.id}", name="#{item.id}", type="number")
+              if item.unit
+                = item.unit
+        tfoot
+          tr
+            th#addingStatus
+            td
+              button#addingButton(onclick='addResearchData("#{sssid}")')
+                i.fa.fa-save &nbsp;Add
 
 block scripts
   script(src="/javascripts/subject.js")

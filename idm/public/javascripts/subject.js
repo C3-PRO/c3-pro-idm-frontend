@@ -6,28 +6,44 @@
 // MARK: - Research Data
 
 function addResearchData(sssid) {
-	var data = [{
-		"id": "hcv-rna",
-		"value": 666
-	}];
+	$('#addingStatus').append("Adding...");
+	$('#addingButton').prop('enabled', false);
+	var tbl = $('#research-data');
+	var data = tbl.find('.form-control').map(function() {
+		if ($(this).val()) {
+			return {
+				id: $(this).attr('id'),
+				value: $(this).val(),
+			}
+		}
+	});
+	if (0 == data.length) {
+		$('#addingStatus').empty();
+		$('#addingButton').prop('enabled', true);
+		return;
+	}
+	
+	// POST data
 	$.ajax({type: 'POST', url: '/subjects/'+sssid+'/addData', data: JSON.stringify({'data': data}), contentType : 'application/json'})
 	.done(function(json, status, req) {
 		if (status.errorMessage) {
-			console.error('addResearchData error: ', json);
-			alert(json.errorMessage + ", please try again");
+			$('#addingStatus').empty();
+			reportError(status, json, 'addResearchData')
 		}
 		else {
-			console.log('addResearchData done', json);
+			$('#addingStatus').empty().append('<span class="success">Added!</span>');
 		}
+		$('#addingButton').prop('enabled', true);
 	})
 	.fail(function(req, status, error) {
-		console.log('addResearchData fail', req, status, error);
 		if (401 == req.status) {
 			provokeLogin('/subjects/'+sssid);
 		}
 		else {
-			alert(error);
+			reportError(status, {errorMessage: error}, 'addResearchData')
 		}
+		$('#addingStatus').empty();
+		$('#addingButton').prop('enabled', true);
 	})
 }
 
