@@ -35,7 +35,10 @@ router.post('/', function(req, res, next) {
         if (error) {
             var title = config.app ? config.app.login_title : null;
             var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
-            var forgot = base + config.jwt.forgot_password;
+            var forgot = null;
+            if (config.jwt.forgot_password) {
+                forgot = (config.jwt.forgot_password.indexOf('//') >= 0) ? config.jwt.forgot_password : base + config.jwt.forgot_password;
+            }
             res.render('login', {
                 title: title,
                 destination: req.body.destination,

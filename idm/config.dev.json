@@ -40,7 +40,8 @@
     "port": 9096,
     "protocol": "http",
     "endpoint": "/auth",
-    "forgot_password": "/iforgot"
+    "forgot_password": "/iforgot",
+    "forgot_password_EXAMPLE_FULL_HOST": "https://reset.c3-pro.io/iforgot"
   },
   "mail": {
     "host": "127.0.0.1",
