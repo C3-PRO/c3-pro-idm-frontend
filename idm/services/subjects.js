@@ -10,18 +10,18 @@ var exports = module.exports = {};
 var app = express();
 
 
-// verify subjects endpoint config
-if (!config || !config.subjects || !config.subjects.host || !config.subjects.endpoint) {
-    throw Error('config.subjects is incomplete, need at least `host` and `endpoint`');
+// verify service endpoint config
+if (!config || !config.service || !config.service.host) {
+    throw Error('config.service is incomplete, need at least `host`');
 }
 
 
 exports.getSubjects = function(opt, func) {
-    var fullEndPoint = config.subjects.endpoint + '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
+    var query = '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
     if (typeof opt.status != 'undefined') {
-        fullEndPoint = fullEndPoint + '&status=' + opt.status;
+        query = query + '&status=' + opt.status;
     }
-    var options = setBaseOptions(opt, fullEndPoint, 'GET');
+    var options = setBaseOptions(opt, query, 'GET');
     
     request(options, function(error, response, body) {
         var data = config.dataOrErrorFromJSONResponse(error, response, body, function(parsed) {
@@ -36,7 +36,7 @@ exports.getSubjects = function(opt, func) {
 }
 
 exports.getSubject = function(opt, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid, 'GET');
+    var options = setBaseOptions(opt, '/'+opt.sssid, 'GET');
     request(options, function(error, response, body) {
         var data = config.dataOrErrorFromJSONResponse(error, response, body, function(parsed) {
             var subject = parsed.data || parsed.subject;
@@ -48,7 +48,7 @@ exports.getSubject = function(opt, func) {
 }
 
 exports.newSubject = function(opt, subject, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint, 'POST');
+    var options = setBaseOptions(opt, null, 'POST');
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(subject);
     
@@ -60,7 +60,7 @@ exports.newSubject = function(opt, subject, func) {
 }
 
 exports.updateSubject = function(opt, subject, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid, 'PUT');
+    var options = setBaseOptions(opt, '/'+opt.sssid, 'PUT');
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(subject);
     
@@ -77,7 +77,7 @@ exports.updateSubject = function(opt, subject, func) {
 }
 
 exports.getSubjectLinks = function(opt, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/links', 'GET');
+    var options = setBaseOptions(opt, '/'+opt.sssid+'/links', 'GET');
     options.headers["Accept"] = "application/json";
     
     request(options, function(error, response, body) {
@@ -88,7 +88,7 @@ exports.getSubjectLinks = function(opt, func) {
 }
 
 exports.createSubjectLink = function(opt, func) {
-    var options = setBaseOptions(opt, config.subjects.endpoint+'/'+opt.sssid+'/links', 'POST');
+    var options = setBaseOptions(opt, '/'+opt.sssid+'/links', 'POST');
     options.headers["Accept"] = "application/json";
     
     request(options, function(error, response, body) {
@@ -154,12 +154,13 @@ exports.getSubjectQRCode = function(opt, func) {
  Helper functions
  ***************/
 
-function setBaseOptions(opt, endpoint, method) {
+function setBaseOptions(opt, pathQuery, method) {
+    var ep = (config.service.endpoint ? config.service.endpoint : '') + '/subject' + (pathQuery ? pathQuery : '');
     var options = {
-        uri: (config.subjects.protocol || 'https') + "://" + config.subjects.host + (config.subjects.port ? ':'+config.subjects.port  :'') + endpoint,
+        uri: (config.service.protocol || 'https') + "://" + config.service.host + (config.service.port ? ':'+config.service.port  :'') + ep,
         method : method,
         headers: {
-            'Authorization': config.subjects.token_type + ' ' + opt.token,
+            'Authorization': (config.service.token_type || 'Bearer') + ' ' + opt.token,
         }
     }
     return options;

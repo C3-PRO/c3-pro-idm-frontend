@@ -4,9 +4,9 @@ var QRCode = require('qrcode');
 var exports = module.exports = {};
 
 
-// verify links endpoint config
-if (!config || !config.links || !config.links.host || !config.links.endpoint) {
-    throw Error('config.links is incomplete, need at least `host` and `endpoint`');
+// verify service endpoint config
+if (!config || !config.service || !config.service.host) {
+    throw Error('config.service is incomplete, need at least `host`');
 }
 
 
@@ -16,7 +16,7 @@ exports.getJWTForLink = function(opt, func) {
 		func(data, opt);
 		return;
 	}
-    var options = setBaseOptions(opt, config.links.endpoint+'/'+opt.jti+'/jwt', 'GET');
+    var options = setBaseOptions(opt, '/'+opt.jti+'/jwt', 'GET');
     options.headers['Accept'] = "application/jwt";
     request(options, function(error, response, body) {
         //console.log('services/links/getJWTForLink:', body);
@@ -60,12 +60,13 @@ function qrCodeForJWT(jwt, callback) {
     });
 }
 
-function setBaseOptions(opt, endpoint, method) {
+function setBaseOptions(opt, pathQuery, method) {
+    var ep = (config.service.endpoint ? config.service.endpoint : '') + '/link' + (pathQuery ? pathQuery : '');
     var options = {
-        uri: config.links.protocol + '://' + config.links.host + ':' + config.links.port + endpoint,
+        uri: (config.service.protocol || 'https') + "://" + config.service.host + (config.service.port ? ':'+config.service.port  :'') + ep,
         method : method,
         headers: {
-            'Authorization': (config.links.token_type || 'Bearer') + ' ' + opt.token,
+            'Authorization': (config.service.token_type || 'Bearer') + ' ' + opt.token,
         }
     }
     return options;
