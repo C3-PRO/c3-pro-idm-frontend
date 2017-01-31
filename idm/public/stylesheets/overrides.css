@@ -13,6 +13,9 @@ h1:first-child {
 	margin-bottom: 2em;
 	border-width: 0;
 }
+.subject-table {
+	margin-top: 0.75em;
+}
 .pure-table .subject_name {
 	font-weight: bold;
 }
@@ -91,6 +94,9 @@ td.subject_status > div {
 }
 .error {
 	color: #900;
+}
+input.error {
+	background-color: rgb(255,228,220) !important;
 }
 .success {
 	color: #5A2; font-weight: bold;

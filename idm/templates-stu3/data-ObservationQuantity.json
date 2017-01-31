@@ -1,7 +1,7 @@
 {
   "resourceType": "Observation",
   "subject": {
-    "reference": "Patient/{{sssid}}"
+    "reference": "Patient/{{uuid}}"
   },
   "code": {
     "coding": [{
@@ -11,7 +11,7 @@
     }],
     "text": "{{humanDisplay}}"
   },
-  "effectiveDateTime": "{{date}}",
+  "effectiveDateTime": "{{datetime}}",
   "valueQuantity": {
     "value": {{value}},
     "unit": "{{unit}}",

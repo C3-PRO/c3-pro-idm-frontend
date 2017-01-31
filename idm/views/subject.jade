@@ -33,10 +33,9 @@ block content
             td.subject_name
               input.form-control(name="name", type="text", value=subject.name)
           tr
-            th Birthdate *:<br>
-              span.small (YEAR-MM-DD)
+            th Birthdate *:
             td
-              input.form-control(name="bday", type="date", value=subject.bday)
+              input.form-control(name="bday", type="date", value=subject.bday, onblur="formatDateTime(this, 'YYYY-MM-DD')")
           tr
             th Email Address:
             td
@@ -53,18 +52,28 @@ block content
               button(onclick="cancel();return false;")
                 i.fa.fa-stop &nbsp;Cancel
     
-    if subject.status > 0 && subject.status < 3 && data_to_add
+    if subject.status > 1 && subject.status < 3 && data_to_add
       hr
       h2 Add Research Data
+      p.
+        Data you enter here will be added to the subject's research data.
+        You will see a success message next to the “Add” button but will not be able to change or delete the data you've added at a later point in time.
+      
       table#research-data.subject-table
+        thead
+          th
+          th Value
+          th Date
         tbody
         each item in data_to_add
           tr
             th= item.humanDisplay
             td
-              input.form-control(id="#{item.id}", name="#{item.id}", type="number")
+              input.form-control.data-item-value(id="#{item.id}", name="#{item.id}", type="number")
               if item.unit
                 = item.unit
+            td
+              input.form-control.data-item-datetime(id="date_#{item.id}", name="date_#{item.id}", type="datetime", onblur="formatDateTime(this)")
         tfoot
           tr
             th#addingStatus
@@ -78,3 +87,4 @@ block scripts
     function cancel() {
       window.location.href = '/subjects'
     }
+    $('.data-item-datetime').attr('placeholder', moment().format('YYYY-MM-DD HH:mm'));
