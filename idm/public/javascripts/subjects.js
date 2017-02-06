@@ -15,7 +15,7 @@ function getRecentSubjects(num, callback) {
 			var tbl = $('#recent');
 			var num = renderSubjectsInto(data, tbl, false, use_num);
 			if (0 == num) {
-				var td = tbl.find('.loading').empty();
+				var td = tbl.find('.message').empty();
 				td.append('<p>No subjects</p>');
 				td.append('<p><a href="subjects/0">Add a subject</a></p>');
 			}
@@ -27,7 +27,7 @@ function getRecentSubjects(num, callback) {
 			}
 			else {
 				var detail = (error && 'errorMessage' in error) ? '<p>'+error.errorMessage+'</p>' : '';
-				$('#recent .loading').html('<p class="error">Failed retrieving recent subjects</p>'+detail);
+				$('#recent .message').html('<p class="error">Failed retrieving recent subjects</p>'+detail);
 			}
 		}
 	);
@@ -38,15 +38,13 @@ function getSubjects(searchstring, start, batch) {
 	loadSubjectsData(searchstring, start, use_batch+1, 'name', 'ASC',
 		function(data) {
 			var tbody = $('#subjects');
-			tbody.find('.loading').remove();
-			var num = renderSubjectsInto(data, tbody, (start > 0), use_batch);
+			tbody.find('.message').remove();
+			var num = renderSubjectsInto(data, tbody, (start > 0), use_batch, searchstring);
 			if (num > use_batch) {
 				var srch = searchstring ? encodeURI(searchstring) : '';
 				var strt = (start || 0)*1 + use_batch;
-				var a = $('<a/>', {'href': 'javascript:getSubjects("'+srch+'",'+strt+','+use_batch+');'}).text("Load More Results");
-				var td = $('<td/>', {'colspan': 8}).append(a);
-				var tr = $('<tr/>').addClass('loading').append(td);
-				tbody.append(tr);
+				var more = $('<a/>', {'href': 'javascript:getSubjects("'+srch+'",'+strt+','+use_batch+');'}).text("Load More Results");
+				showSubjectsHint(more)
 			}
 		},
 		function(error) {
@@ -55,13 +53,15 @@ function getSubjects(searchstring, start, batch) {
 					provokeLogin('/subjects');
 				}
 				else {
-					var detail = ('message' in error) ? '<p>'+error['message']+'</p>' : '';
-					$('#loading').html('<p class="error">Failed retrieving subjects</p>'+detail);
+					var detail = ('errorMessage' in error) ? '<p>'+error.errorMessage+'</p>' : '';
+					showSubjectsHint('<p class="error">Failed retrieving subjects</p>'+detail);
 				}
 			}
 		}
 	);
 }
+
+var _latestLoad = null;
 
 function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, successCB, errorCB) {
 	var st = start ? start : 0;
@@ -69,7 +69,12 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	var oCol = orderCol || 'name';
 	var oDir = (orderDir && 'desc' == orderDir.toLowerCase()) ? orderDir : 'ASC';
 	var url = '/subjects/api/'+st+'/'+(b || 50)+'/'+oCol+'/'+oDir;
+	var thisLoad = Date();
+	_latestLoad = thisLoad;
 	$.getJSON(url + (searchstring ? '&search='+encodeURI(searchstring) : ''), function(json, status, req) {
+		if (_latestLoad && _latestLoad != thisLoad) {
+			return;
+		}
 		if ('data' in json) {
 			successCB(json.data);
 		}
@@ -78,6 +83,9 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 		}
 	})
 	.fail(function(req, status, error) {
+		if (_latestLoad && _latestLoad != thisLoad) {
+			return;
+		}
 		console.error('loadSubjectsData() failed:', status, error);
 		if (401 == req.status) {
 			provokeLogin('/subjects');
@@ -88,7 +96,7 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	});
 }
 
-function renderSubjectsInto(data, table, append, max) {
+function renderSubjectsInto(data, table, append, max, searchstring) {
 	var template = $('#tmpl_row').html();
 	Mustache.parse(template);
 	if (data.length > 0) {
@@ -101,6 +109,10 @@ function renderSubjectsInto(data, table, append, max) {
 			var rendered = Mustache.render(template, treated);
 			table.append(rendered);
 		}
+	}
+	else if (!append) {
+		table.empty();
+		showSubjectsHint("No Subjects" + (searchstring ? " for “"+searchstring+"”" : ''));
 	}
 	return data.length;
 }
@@ -125,6 +137,33 @@ function treatedSubjectData(data) {
         data.withdrawnDate = moment(data.date_withdrawn).format('lll');
     }
 	return data;
+}
+
+function showSubjectsHint(content) {
+	var tbody = $('#subjects');
+	tbody.find('.message').remove();
+	var td = $('<td/>', {'colspan': 8}).addClass('message').append(content);
+	tbody.append($('<tr/>').append(td));
+}
+
+
+// MARK: - Search
+
+var _timeout = null;
+
+function subjectSearch(field) {
+	if (_timeout) {
+		window.clearTimeout(_timeout);
+		_timeout = null;
+	}
+	
+	var searchstr = $(field).val();
+	if (!searchstr) {
+		getSubjects();
+	}
+	else {
+		_timeout = window.setTimeout('getSubjects("'+searchstr+'")', 300);
+	}
 }
 
 

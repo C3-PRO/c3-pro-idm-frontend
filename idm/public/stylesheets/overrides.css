@@ -72,6 +72,18 @@ td.subject_status > div {
 	background-color: #900 !important;
 }
 
+#subject_search_parent {
+	float: right;
+}
+#subject_search_parent input {
+	display: inline-block; width: 12em;
+	margin: 0 0.5em 0 0;
+	border: 1px solid #cbcbcb; border-radius: 2pt;
+}
+#subject_search_parent input, #subject_search_parent button {
+	font-size: 0.85em;
+}
+
 #blackout {
 	position: fixed; top: 0; left: 0; right: 0; bottom: 0;
 	background-color: rgba(0,0,0,0.75);
