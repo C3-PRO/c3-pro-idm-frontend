@@ -17,7 +17,7 @@ if (!config || !config.service || !config.service.host) {
 
 
 exports.getSubjects = function(opt, func) {
-    var query = '?page='+opt.page+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
+    var query = '?offset='+opt.offset+'&perpage='+opt.perpage+'&ordercol='+opt.ordercol+'&orderdir='+opt.orderdir;
     if (typeof opt.status != 'undefined') {
         query = query + '&status=' + opt.status;
     }

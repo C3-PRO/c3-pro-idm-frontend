@@ -13,7 +13,7 @@ function getRecentSubjects(num, callback) {
 	loadSubjectsData(null, 0, use_num+1, 'changed', 'DESC',
 		function(data) {
 			var tbl = $('#recent');
-			var num = renderSubjectsInto(data, tbl, use_num);
+			var num = renderSubjectsInto(data, tbl, false, use_num);
 			if (0 == num) {
 				var td = tbl.find('.loading').empty();
 				td.append('<p>No subjects</p>');
@@ -34,10 +34,20 @@ function getRecentSubjects(num, callback) {
 }
 
 function getSubjects(searchstring, start, batch) {
-	loadSubjectsData(searchstring, start, batch, 'name', 'ASC',
+	var use_batch = batch || 50;
+	loadSubjectsData(searchstring, start, use_batch+1, 'name', 'ASC',
 		function(data) {
-			var tbl = $('#subjects');
-			renderSubjectsInto(data, tbl);
+			var tbody = $('#subjects');
+			tbody.find('.loading').remove();
+			var num = renderSubjectsInto(data, tbody, (start > 0), use_batch);
+			if (num > use_batch) {
+				var srch = searchstring ? encodeURI(searchstring) : '';
+				var strt = (start || 0)*1 + use_batch;
+				var a = $('<a/>', {'href': 'javascript:getSubjects("'+srch+'",'+strt+','+use_batch+');'}).text("Load More Results");
+				var td = $('<td/>', {'colspan': 8}).append(a);
+				var tr = $('<tr/>').addClass('loading').append(td);
+				tbody.append(tr);
+			}
 		},
 		function(error) {
 			if (error) {
@@ -78,16 +88,18 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	});
 }
 
-function renderSubjectsInto(data, table, max) {
+function renderSubjectsInto(data, table, append, max) {
 	var template = $('#tmpl_row').html();
 	Mustache.parse(template);
 	if (data.length > 0) {
-		var tbody = table.empty();
+		if (!append) {
+			table.empty();
+		}
 		var stop = (max > 0) ? Math.min(max, data.length) : data.length;
 		for (var i = 0; i < stop; i++) {
 			var treated = treatedSubjectData(data[i]);
 			var rendered = Mustache.render(template, treated);
-			tbody.append(rendered);
+			table.append(rendered);
 		}
 	}
 	return data.length;

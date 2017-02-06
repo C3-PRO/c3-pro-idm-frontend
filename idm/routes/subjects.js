@@ -6,7 +6,7 @@ var service = require('../services/subjects');
 var data = require('../services/data');
 
 
-router.get('/api/:page/:perpage/:ordercol/:orderdir', function(req, res, next) {
+router.get('/api/:offset/:perpage/:ordercol/:orderdir', function(req, res, next) {
     var sess = req.session;
     if (sess.token) {
         var opt = req.params;
