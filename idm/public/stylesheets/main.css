@@ -7,54 +7,6 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
-/* Reset */
-
-	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption, article, aside, canvas, details, embed, figure, figcaption, footer, header, menu, nav, output, ruby, section, summary, time, mark, audio, video, table, td, th, thead, tr, tfoot {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		font-size: 100%;
-		font: inherit;
-		vertical-align: baseline;
-	}
-
-	article, aside, details, figcaption, figure, footer, header, menu, nav, section {
-		display: block;
-	}
-
-	body {
-		line-height: 1;
-	}
-
-	ol, ul {
-		list-style: none;
-	}
-
-	blockquote, q {
-		quotes: none;
-	}
-
-	blockquote:before, blockquote:after, q:before, q:after {
-		content: '';
-		content: none;
-	}
-/*
-	table {
-		border-collapse: collapse;
-		border-spacing: 0;
-	}
-*/
-	body {
-		-webkit-text-size-adjust: none;
-	}
-
-/* Box Model */
-
-	*, *:before, *:after {
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
-		box-sizing: border-box;
-	}
 
 /* Containers */
 
@@ -1833,14 +1785,6 @@
 			border-bottom-color: transparent;
 		}
 
-	strong, b {
-		font-weight: 600;
-	}
-
-	em, i {
-		font-style: italic;
-	}
-
 	p, ul, ol, dl, table, blockquote {
 		margin: 0 0 2em 0;
 	}
@@ -1848,8 +1792,6 @@
 	h1, h2, h3, h4, h5, h6 {
 		color: inherit;
 		font-weight: 600;
-		line-height: 1.75em;
-		margin-bottom: 1em;
 	}
 
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
