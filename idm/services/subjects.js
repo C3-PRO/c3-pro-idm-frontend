@@ -149,6 +149,17 @@ exports.getSubjectQRCode = function(opt, func) {
     });
 }
 
+exports.getSubjectAuditHistory = function(opt, func) {
+    var options = setBaseOptions(opt, '/'+opt.sssid+'/audits', 'GET');
+    options.headers["Accept"] = "application/json";
+    
+    request(options, function(error, response, body) {
+        //console.log('services/subjects/getSubjectAuditHistory:', body);
+        var json = config.dataOrErrorFromJSONResponse(error, response, body);
+        func(json, opt);
+    });
+}
+
 
 /****************
  Helper functions

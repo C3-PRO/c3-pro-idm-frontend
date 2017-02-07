@@ -13,8 +13,11 @@ h1:first-child {
 	margin-bottom: 2em;
 	border-width: 0;
 }
-.subject-table {
+.subject-table, .list-table {
 	margin-top: 0.75em;
+}
+.list-table {
+	width: 100%;
 }
 .pure-table .subject_name {
 	font-weight: bold;
@@ -42,11 +45,11 @@ h1:first-child {
 }
 .pure-table td.sssid,
 .pure-table td.action,
-.pure-table td.message {
+.pure-table td.message, .list-table td.message {
 	font-size: 1.5em;
 	text-align: center; vertical-align: middle;
 }
-.pure-table td.message, .subject-table td.message {
+.pure-table td.message, .subject-table td.message, .list-table td.message {
 	padding: 2em;
 }
 .pure-table td.subject_status {
@@ -99,11 +102,4 @@ td.subject_status > div {
 .qrpopover img {
 	width: 396px; height: 396px;
 	cursor: pointer;
-}
-
-footer .institute img {
-	width: 100px;
-}
-footer .container {
-	max-width: 33em !important;
 }

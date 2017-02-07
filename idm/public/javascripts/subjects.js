@@ -68,7 +68,7 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	var b = batch ? parseInt(batch) : 50;
 	var oCol = orderCol || 'name';
 	var oDir = (orderDir && 'desc' == orderDir.toLowerCase()) ? orderDir : 'ASC';
-	var url = '/subjects/api/'+st+'/'+(b || 50)+'/'+oCol+'/'+oDir;
+	var url = '/subjects/api/s/'+st+'/'+(b || 50)+'/'+oCol+'/'+oDir;
 	var thisLoad = Date();
 	_latestLoad = thisLoad;
 	$.getJSON(url + (searchstring ? '&search='+encodeURI(searchstring) : ''), function(json, status, req) {

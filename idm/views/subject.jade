@@ -80,11 +80,30 @@ block content
             td
               button#addingButton(onclick='addResearchData("#{sssid}")')
                 i.fa.fa-save &nbsp;Add
+    
+    h2 Activity Log
+    table.list-table
+      tbody#audit
+        tr
+          td.message(colspan='3')
+            p Loading activity...
+    
+    script(id='tmpl_audit', type='x-tmpl-mustache').
+      <tr>
+        <td>{{ humanDateTime }}</td>
+        <td>{{ actor }}</td>
+        <td>{{ action }}</td>
+      </tr>
+    
 
 block scripts
   script(src="/javascripts/subject.js")
   script.
     function cancel() {
-      window.location.href = '/subjects'
+      window.location.href = '/subjects';
     }
-    $('.data-item-datetime').attr('placeholder', moment().format('YYYY-MM-DD HH:mm'));
+    $(document).ready(function() {
+      loadAuditHistory('#{sssid}', '#audit');
+      $('.data-item-datetime').attr('placeholder', moment().format('YYYY-MM-DD HH:mm'));
+    });
+  

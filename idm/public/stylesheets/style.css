@@ -68,9 +68,15 @@ footer p {
 footer p:first-child {
 	margin-top: 0;
 }
+footer .container {
+	max-width: 33em !important;
+}
 footer .institute {
 	float: left;
 	margin-right: 1em;
+}
+footer .institute img {
+	width: 100px;
 }
 
 

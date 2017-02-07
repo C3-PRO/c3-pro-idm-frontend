@@ -6,7 +6,7 @@ var service = require('../services/subjects');
 var data = require('../services/data');
 
 
-router.get('/api/:offset/:perpage/:ordercol/:orderdir', function(req, res, next) {
+router.get('/api/s/:offset/:perpage/:ordercol/:orderdir', function(req, res, next) {
     var sess = req.session;
     if (sess.token) {
         var opt = req.params;
@@ -16,6 +16,40 @@ router.get('/api/:offset/:perpage/:ordercol/:orderdir', function(req, res, next)
         opt.res = res;
         
         service.getSubjects(opt, function(data, opt) {
+            if (data.data) {
+                opt.res.json(data);
+            }
+            else {
+                if (data.statusCode == 401) {
+                    opt.sess.destroy(function (err) {
+                        if (err) {
+                            console.error("Failed to destroy session", err);
+                        }
+                    });
+                }
+                opt.res.json(data);
+            }
+        });
+    }
+    else {
+        res.status(401).json({
+            errorMessage: "Unauthorized",
+            statusCode: 401,
+        });
+    }
+});
+
+
+router.get('/api/audit/:sssid', function(req, res, next) {
+    var sess = req.session;
+    if (sess.token) {
+        var opt = req.params;
+        opt.token = sess.token;
+        opt.sess = sess;
+        opt.status = req.query.status;
+        opt.res = res;
+        
+        service.getSubjectAuditHistory(opt, function(data, opt) {
             if (data.data) {
                 opt.res.json(data);
             }

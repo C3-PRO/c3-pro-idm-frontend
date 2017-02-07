@@ -78,3 +78,65 @@ function enableDisableAddingButton() {
 	$('#addingButton').prop('disabled', fails.indexOf(1) >= 0);
 }
 
+
+// MARK: - Audit Log
+
+function loadAuditHistory(sssid, elem) {
+	loadAuditData(sssid,
+		function(audits) {
+			console.log("--->", audits, elem);
+			var tbody = $(elem);
+			if (audits && audits.length > 0) {
+				tbody.empty();
+				
+				var template = $('#tmpl_audit').html();
+				Mustache.parse(template);
+				for (var i = 0; i < audits.length; i++) {
+					var treated = treatedAuditData(audits[i]);
+					var rendered = Mustache.render(template, treated);
+					tbody.append(rendered);
+				}
+			}
+			else {
+				tbody.find('.message').empty().text("No activity logged");
+			}
+		},
+		function(error) {
+			console.error("loadAuditHistory() failed:", error);
+			var detail = ('errorMessage' in error) ? '<p>'+error.errorMessage+'</p>' : error;
+			$(elem).find('.message').empty().append(detail);
+		}
+	);
+}
+
+function loadAuditData(sssid, successCB, errorCB) {
+	if (!sssid) {
+		errorCB({errorMessage: "No sssid given, aborting"});
+		return;
+	}
+	$.getJSON('/subjects/api/audit/'+sssid, function(json, status, req) {
+		if ('data' in json) {
+			successCB(json.data);
+		}
+		else {
+			errorCB(json);
+		}
+	})
+	.fail(function(req, status, error) {
+		console.error('loadAuditData() failed:', status, error);
+		if (401 == req.status) {
+			provokeLogin('/subject/'+sssid);
+		}
+		else {
+			errorCB(error);
+		}
+	});
+}
+
+function treatedAuditData(data) {
+	if (data.datetime) {
+		data.humanDateTime = moment(data.datetime).format('lll');
+	}
+	return data;
+}
+
