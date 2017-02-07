@@ -24,87 +24,38 @@ a:visited {
 
 
 /* Classes */
-.errormsg {
-	color: firebrick;
+.small, .pure-table .small {
+	font-size: 0.85em;
 }
 
 .okmsg {
 	color: green;
 }
-
-.reduced {
-	max-width: 70%;
-	height: auto;
+.errormsg {
+	color: firebrick;
 }
-
-.reduced-less {
-	max-width: 100%;
-	height: auto;
+.error {
+	color: #900;
 }
-
-.reduced-more {
-	max-width: 60%;
-	height: auto;
+input.error {
+	background-color: rgb(255,228,220) !important;
 }
-
-ul.navi {
-	margin: 0; padding: 0;
-	list-style-type: none;
-	color: rgba(255,255,255,0.5);
+.success {
+	color: #5A2; font-weight: bold;
 }
-.navi li:before, .navi li:hover:before, .navi li::before, .navi li:hover::before {
-	content: "•";
-	margin: 0 0.5em;
-	text-decoration: none;
+.inactive, a.inactive, a.inactive:hover, a.inactive:visited {
+	color: #999;
 }
 
 /* Header & Footer */
-header {
-	font: normal 300 15pt/1.4 "Helvetica Neue Thin", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-header h1, header h2 {
-	font-weight: 200;
-}
-header h1 {
-	margin: 0 0 0.35em;
-	font-size: 1.5em;
-}
-header h1 em {
-	font-weight: 500;
-}
-header h2 {
-	/*color: rgba(255,255,255,0.6); letter-spacing: normal;*/
-	letter-spacing: normal;
-}
 header a {
 	color: white;
-}
-
-#header {
-	padding: 0;
-}
-#nav {
-	font-family: "Helvetica Neue Thin", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 300;
-}
-#nav > ul > li.current {
-	font-weight: 400;
-}
-
-#banner {
-	font-family: "Helvetica Neue Thin", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 300;
-	background: white;
-}
-#banner header {
-	padding: 1.25em 0;
-}
-#banner img.overview {
-	max-width: 100%;
 }
 
 footer {
 	min-height: 6em;
 	margin: 0; padding: 2em 0 4em;
-	font-size: 0.8em; text-align: center;
+	font-size: 0.8em;
 	border-top: 1px solid rgb(160,160,160);
 }
 footer a:link, a:hover, a:visited {
@@ -116,6 +67,10 @@ footer p {
 }
 footer p:first-child {
 	margin-top: 0;
+}
+footer .institute {
+	float: left;
+	margin-right: 1em;
 }
 
 
@@ -142,19 +97,10 @@ footer p:first-child {
 	#banner img.overview {
 		padding: 10px 15px;
 	}
-	.institute {
-		width: 220px;
-	}
 }
 
 /* tablets and up */
 @media screen and (min-width: 480px) {
-	.navi li {
-		display: inline-block;
-	}
-	.navi li:first-child:before, .navi li:first-child::before {
-		content: "";
-	}
 }
 
 /* tablets */
@@ -166,7 +112,6 @@ footer p:first-child {
 		font-size: 1.7em;
 	}
 	header {
-		padding: 0.5em 20px 0.33em;
 		font-size: 13pt;
 	}
 }

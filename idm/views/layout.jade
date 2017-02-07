@@ -8,25 +8,25 @@ html
     link(rel='stylesheet', href='/stylesheets/overrides.css')
   body
     div#page-wrapper
-      div#header
+      header
         nav#nav
           ul
             li
               a(href="/subjects/0")
                 i.fa.fa-plus
-                  p New Subject
+                p New Subject
             li
               a(href="/subjects")
                 i.fa.fa-list-alt
-                  p Subjects
+                p Subjects
             li
               a(href="/logout")
                 i.fa.fa-sign-out
-                  p Logout
+                p Logout
     section.wrapper.style1
       div.container
         block content
-    footer
+    footer.wrapper
       include footer
     
     script(type='text/javascript', src='//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js')
