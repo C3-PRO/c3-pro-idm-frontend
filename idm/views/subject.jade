@@ -81,19 +81,20 @@ block content
               button#addingButton(onclick='addResearchData("#{sssid}")')
                 i.fa.fa-save &nbsp;Add
     
-    h2 Activity Log
-    table.list-table
-      tbody#audit
-        tr
-          td.message(colspan='3')
-            p Loading activity...
-    
-    script(id='tmpl_audit', type='x-tmpl-mustache').
-      <tr>
-        <td>{{ humanDateTime }}</td>
-        <td>{{ actor }}</td>
-        <td>{{ action }}</td>
-      </tr>
+    if 0 != sssid
+      h2 Activity Log
+      table.list-table
+        tbody#audit
+          tr
+            td.message(colspan='3')
+              p Loading activity...
+      
+      script(id='tmpl_audit', type='x-tmpl-mustache').
+        <tr>
+          <td>{{ humanDateTime }}</td>
+          <td>{{ actor }}</td>
+          <td>{{ action }}</td>
+        </tr>
     
 
 block scripts
@@ -102,8 +103,10 @@ block scripts
     function cancel() {
       window.location.href = '/subjects';
     }
-    $(document).ready(function() {
-      loadAuditHistory('#{sssid}', '#audit');
-      $('.data-item-datetime').attr('placeholder', moment().format('YYYY-MM-DD HH:mm'));
-    });
+  if 0 != sssid
+    script.
+      $(document).ready(function() {
+        loadAuditHistory('#{sssid}', '#audit');
+        $('.data-item-datetime').attr('placeholder', moment().format('YYYY-MM-DD HH:mm'));
+      });
   
