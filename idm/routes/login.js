@@ -12,12 +12,10 @@ router.get('/', function(req, res, next) {
     else {
         var title = config.app ? config.app.login_title : null;
         // TODO: decide between oauth and JWT
-        var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
-        var forgot = base + config.jwt.forgot_password;
         res.render('login', {
             title: title,
             destination: req.query.dest,
-            forgot_password: forgot});
+            forgot_password: forgotPasswordURL()});
     }
 });
 
@@ -34,17 +32,13 @@ router.post('/', function(req, res, next) {
     service_jwt.jwt(opt, function(username, token, sess, error) {
         if (error) {
             var title = config.app ? config.app.login_title : null;
-            var base = (config.jwt.protocol || 'https') + '://' + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
-            var forgot = null;
-            if (config.jwt.forgot_password) {
-                forgot = (config.jwt.forgot_password.indexOf('://') >= 0) ? config.jwt.forgot_password : base + config.jwt.forgot_password;
-            }
+            
             res.render('login', {
                 title: title,
                 destination: req.body.destination,
                 username: username,
                 errmessage: error,
-                forgot_password: forgot});
+                forgot_password: forgotPasswordURL()});
         }
         else {
             sess.username = username;
@@ -53,5 +47,16 @@ router.post('/', function(req, res, next) {
         }
     });
 });
+
+function forgotPasswordURL() {
+    if (config.jwt.forgot_password) {
+        if (config.jwt.forgot_password.indexOf('://') >= 0) {
+            return config.jwt.forgot_password;
+        }
+        var base = (config.jwt.protocol || 'https') + '://' + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
+        return base + config.jwt.forgot_password;
+    }
+    return null;
+}
 
 module.exports = router;
