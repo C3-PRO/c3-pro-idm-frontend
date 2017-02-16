@@ -110,7 +110,7 @@ exports.getSubjectQRCode = function(opt, func) {
             if (json.data) {
                 var now = moment();
                 for (var i = 0; i < json.data.length; i++) {
-                    var exp = json.data[i].exp ? moment(json.data[i].exp) : null;
+                    var exp = json.data[i].exp ? moment(json.data[i].exp*1000) : null;
                     if (!exp || exp > now) {
                         useLink = json.data[i];
                         break;
@@ -178,11 +178,6 @@ function setBaseOptions(opt, pathQuery, method) {
 }
 
 function manipulateSubjectData(subject) {
-    setSubjectStatusString(subject);
-    normalizeSubjectDates(subject);
-}
-
-function setSubjectStatusString(subject) {
     if (subject.date_withdrawn) {
         subject.status = 3;
         subject.human_status = "Withdrawn";
@@ -202,15 +197,6 @@ function setSubjectStatusString(subject) {
     else {
         subject.status = 0;
         subject.human_status = "Pending";
-    }
-}
-
-function normalizeSubjectDates(subject) {
-    if (subject.created) {
-        subject.date_created = moment(subject.created * 1000).format();
-    }
-    if (subject.changed) {
-        subject.date_changed = moment(subject.changed * 1000).format();
     }
 }
 

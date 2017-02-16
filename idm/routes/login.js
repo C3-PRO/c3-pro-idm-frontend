@@ -24,20 +24,20 @@ router.get('/', function(req, res, next) {
 /* POST for log in*/
 router.post('/', function(req, res, next) {
     var opt = {
-        "username": req.body.username,
-        "password": req.body.password,
-        "sess": req.session,
-        "res": res,
+        username: req.body.username,
+        password: req.body.password,
+        sess: req.session,
+        res: res,
     };
     // TODO: check config to decide between OAuth2 or JWT
     //service_oauth.oauth(opt, function(username, token, sess) {
     service_jwt.jwt(opt, function(username, token, sess, error) {
         if (error) {
             var title = config.app ? config.app.login_title : null;
-            var base = (config.jwt.protocol || 'https') + "://" + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
+            var base = (config.jwt.protocol || 'https') + '://' + config.jwt.host + (config.jwt.port ? ':' + config.jwt.port : '');
             var forgot = null;
             if (config.jwt.forgot_password) {
-                forgot = (config.jwt.forgot_password.indexOf('//') >= 0) ? config.jwt.forgot_password : base + config.jwt.forgot_password;
+                forgot = (config.jwt.forgot_password.indexOf('://') >= 0) ? config.jwt.forgot_password : base + config.jwt.forgot_password;
             }
             res.render('login', {
                 title: title,
