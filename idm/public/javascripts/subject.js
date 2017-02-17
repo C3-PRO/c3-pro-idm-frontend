@@ -68,14 +68,17 @@ function formatDateTime(elem, format) {
 	else {
 		obj.removeClass('error');
 	}
-	enableDisableAddingButton();
 }
 
 function enableDisableAddingButton() {
-	var fails = $('#research-data').find('.data-item-datetime').map(function() {
+	$('#addingButton').prop('disabled', !allInputDataValid());
+}
+
+function allInputDataValid(parent) {
+	var fails = $(parent).find('.date-validate').map(function() {
 		return $(this).hasClass('error') ? 1 : 0;
 	}).get();
-	$('#addingButton').prop('disabled', fails.indexOf(1) >= 0);
+	return fails.indexOf(1) < 0;
 }
 
 
@@ -84,7 +87,6 @@ function enableDisableAddingButton() {
 function loadAuditHistory(sssid, elem) {
 	loadAuditData(sssid,
 		function(audits) {
-			console.log("--->", audits, elem);
 			var tbody = $(elem);
 			if (audits && audits.length > 0) {
 				tbody.empty();

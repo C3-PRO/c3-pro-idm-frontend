@@ -13,8 +13,8 @@ block content
     if !(typeof errorMessage === 'undefined')
       p.errormsg= errorMessage
     
-    form(action="/subjects/#{sssid}", method="POST")
-      table.subject-table
+    form(action="/subjects/#{sssid}", method="POST", onsubmit="return allInputDataValid('#subject-data')")
+      table#subject-data.subject-table
         tbody
           if 0 != sssid
             tr
@@ -35,7 +35,7 @@ block content
           tr
             th Birthdate *:
             td
-              input.form-control(name="bday", type="date", value=subject.bday, onblur="formatDateTime(this, 'YYYY-MM-DD')")
+              input.form-control.date-validate(name="bday", type="date", value=subject.bday, onblur="formatDateTime(this, 'YYYY-MM-DD');")
           tr
             th Email Address:
             td
@@ -46,11 +46,14 @@ block content
             td
               button(type="submit")
                 if 0 == sssid
-                  i.fa.fa-save &nbsp;Create
+                  i.fa.fa-plus-square
+                  | Create
                 else
-                  i.fa.fa-save &nbsp;Update
+                  i.fa.fa-save
+                  | Update
               button(onclick="cancel();return false;")
-                i.fa.fa-stop &nbsp;Cancel
+                i.fa.fa-step-backward
+                | Cancel
     
     if subject.status > 1 && subject.status < 3 && data_to_add
       hr
@@ -73,13 +76,14 @@ block content
               if item.unit
                 = item.unit
             td
-              input.form-control.data-item-datetime(id="date_#{item.id}", name="date_#{item.id}", type="datetime", onblur="formatDateTime(this)")
+              input.form-control.data-item-datetime.date-validate(id="date_#{item.id}", name="date_#{item.id}", type="datetime", onblur="formatDateTime(this); enableDisableAddingButton();")
         tfoot
           tr
             th#addingStatus
             td
               button#addingButton(onclick='addResearchData("#{sssid}")')
-                i.fa.fa-save &nbsp;Add
+                i.fa.fa-plus-square
+                | Add
     
     if 0 != sssid
       h2 Activity Log
