@@ -5,12 +5,15 @@
 var request = require('request');
 var moment = require('moment');
 var fs = require('fs');
+var url = require('url');
 var path = require('path');
 var mustache = require('mustache');
 var config = require('../utils.js');
 var subjects = require('../services/subjects');
 var exports = module.exports = {};
 
+var accessTokens = null;
+var addResearchDataContext = null;
 
 /**
 Takes an `opt` dictionary, which must contain `sssid`, will query all links for
@@ -38,43 +41,172 @@ exports.addResearchData = function(opt, func) {
 			//console.log('services/data/addResearchData() body.data', opt.data);
 			console.log('services/data/addResearchData() subject links', json.data);
 			if (json.data.length > 0) {
-				var num = 0;
+				var enqueued = 0;
+				var contextId = newResearchDataContext(func, opt);
 				
 				// send to all active links (has `linked_to` and `linked_system` and not `withdrawn_on` and is not dupe)
 				var systems_completed = [];
 				for (var i = 0; i < json.data.length; i++) {
 					var lnk = json.data[i];
 					if (lnk.linked_to && lnk.linked_system && !lnk.withdrawn_on && systems_completed.indexOf(lnk.linked_system) < 0) {
+						enqueueResearchDataForContext(contextId);
+						systems_completed.push(lnk.linked_system);
+						enqueued += 1;
 						
-						// found a system to send data to, create resources for all data points that were supplied
-						try {
-							var resources = resourcesForData(lnk.linked_to, opt.data);
-							console.log(resources);
-							num += 1;
-						}
-						catch (exc) {
-							console.error('services/data/addResearchData() subject links', exc);
-							func({errorMessage: exc}, opt);
-							return;
-						}
+						var endpoint = (lnk.linked_system+'/oauth').replace(/([^:]\/)\/+/g, $1)
+						ensureHasAccessToken(endpoint, function(token, error) {
+							try {
+								if (!token) {
+									throw "Failed to be granted access to "+endpoint+': '+error;
+								}
+								
+								// found a system to send data to: create resources for all data points that were supplied
+								var resources = resourcesForData(lnk.linked_to, opt.data);
+								console.log('token', token, 'resources', resources);
+								
+								// TODO: working here
+								dequeueResearchDataFromContext(contextId);
+								// when done must call: func(json, opt);
+							}
+							catch (exc) {
+								console.error('services/data/addResearchData() subject links', exc);
+								dequeueResearchDataFromContext(contextId, exc);
+							}
+						});
 					}
 				}
-				if (num > 0) {
-					func(json, opt);
-				}
-				else {
-					func({errorMessage: "This subject has no active links at this time, must enroll and link before research data can be added"}, opt);
+				
+				// we're either waiting for access token calls to come back, or don't have active links and can call back already
+				if (0 == enqueued) {
+					endResearchDataContext(contextId, "This subject has no active links at this time, must enroll and link before research data can be added");
 				}
 			}
 			else {
 				func({errorMessage: "Nothing to add, please provide values"}, opt);
 			}
 		}
+		else if (!opt.isRetry) {
+			console.log('adding research data failed, retrying', json);
+			opt.isRetry = true;
+			
+		}
 		else {
-			console.log('subject links errored', json.data);
+			console.log('adding research data errored', json);
 			func(json, opt);
 		}
 	});
+}
+
+function newResearchDataContext(func, opt) {
+	var contextId = Math.floor((1 + Math.random()) * 1000000).toString(16);
+	addResearchDataContext[contextId] = {
+		awaiting: 0,
+		func: func,
+		opt: opt,
+		errors: [],
+	};
+	return contextId;
+}
+
+function enqueueResearchDataForContext(contextId) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("enqueueResearchDataForContext for invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	ctx.awaiting = (ctx.awaiting || 0) + 1;
+}
+
+function dequeueResearchDataFromContext(contextId, error) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("dequeueResearchDataFromContext from invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	if (error) {
+		ctx.errors.push(error);
+	}
+	
+	var awaiting = (ctx.awaiting || 0) - 1;
+	if (awaiting < 0) {
+		console.warn("dequeueResearchDataFromContext from context that is not awaiting a dequeue", contextId);
+	}
+	if (awaiting <= 0) {
+		endResearchDataContext(contextId);
+	}
+}
+
+function endResearchDataContext(contextId, error) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("endResearchDataContext on invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	if (error) {
+		ctx.errors.push(error);
+	}
+	if (ctx.func) {
+		var msg = null;
+		if (ctx.errors.length > 0) {
+			msg = {errorMessage: errors.join("\n")};
+		}
+		ctx.func(msg, ctx.opt);
+	}
+	delete addResearchDataContext[contextId];
+}
+
+
+/**
+
+- parameter endpoint: Against which endpoint to authorize
+- parameter callback: A function to call, either contains a string (token), true
+                      meaning no token needed) or null (failed to get token) for
+                      first arg and an error string (if any) as second arg
+*/
+function ensureHasAccessToken(endpoint, callback) {
+	console.log('services/data/ensureHasAccessToken(): endpoint '+endpoint+', host:', url.parse(endpoint).hostname, url.parse(endpoint));
+	if (endpoint in accessTokens) {
+		console.log('services/data/ensureHasAccessToken() using cached token');
+		callback(accessTokens[endpoint], null);
+	}
+	else {
+		var host = url.parse(endpoint).hostname;
+		if (config.data && config.data.oauth2 && host in config.data.oauth2) {
+			obtainAccessToken(endpoint, config.data.oauth2[host], callback);
+		}
+		else {
+			console.log('services/data/ensureHasAccessToken(): '+host+' is not configured for OAuth2');
+			callback(null, null);
+		}
+	}
+}
+
+function obtainAccessToken(endpoint, credentials, callback) {
+	console.log('services/data/obtainAccessToken() for', endpoint);
+	var client_id = oauth2FormEncode(credentials.client_id);
+	var client_secret = oauth2FormEncode(credentials.client_secret);
+	var auth = Buffer.from(client_id+':'+client_secret).toString('base64')
+	var options = {
+        uri: endpoint,
+        method : 'POST',
+        headers: {
+            'Authorization': 'Basic '+auth,
+        },
+        body: 'grant_type=client_credentials',
+    }
+	request(options, function(error, response, body) {
+		console.log('services/data/obtainAccessToken() response for', endpoint, 'error', error, 'response', response, 'body', body);
+		
+		// accessTokens[endpoint] = token
+		callback("access-token-abcdef", null);
+	});
+}
+
+/** Encodes client-id/password for use in the "Authorization: Basic" header for
+OAuth2 calls. See https://tools.ietf.org/html/rfc6749#appendix-B.
+*/
+function oauth2FormEncode(value) {
+	return encodeURIComponent(value).replace('%20', '+');
 }
 
 
