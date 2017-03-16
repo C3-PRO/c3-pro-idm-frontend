@@ -15,9 +15,10 @@ function getRecentSubjects(num, callback) {
 			var tbl = $('#recent');
 			var num = renderSubjectsInto(data, tbl, false, use_num);
 			if (0 == num) {
-				var td = tbl.find('.message').empty();
+				var td = $('<td/>', {'colspan': 8}).addClass('message');
 				td.append('<p>No subjects</p>');
 				td.append('<p><a href="subjects/0">Add a subject</a></p>');
+				tbl.append($('<tr/>').append(td));
 			}
 			callback(num);
 		},
@@ -38,13 +39,15 @@ function getSubjects(searchstring, start, batch) {
 	loadSubjectsData(searchstring, start, use_batch+1, 'name', 'ASC',
 		function(data) {
 			var tbody = $('#subjects');
-			tbody.find('.message').remove();
-			var num = renderSubjectsInto(data, tbody, (start > 0), use_batch, searchstring);
+			var num = renderSubjectsInto(data, tbody, (start > 0), use_batch);
 			if (num > use_batch) {
 				var srch = searchstring ? encodeURI(searchstring) : '';
 				var strt = (start || 0)*1 + use_batch;
 				var more = $('<a/>', {'href': 'javascript:getSubjects("'+srch+'",'+strt+','+use_batch+');'}).text("Load More Results");
 				showSubjectsHint(more)
+			}
+			else if (0 == num && !start) {
+				showSubjectsHint("No Subjects" + (searchstring ? " for “"+searchstring+"”" : ''));
 			}
 		},
 		function(error) {
@@ -96,23 +99,19 @@ function loadSubjectsData(searchstring, start, batch, orderCol, orderDir, succes
 	});
 }
 
-function renderSubjectsInto(data, table, append, max, searchstring) {
-	var template = $('#tmpl_row').html();
-	Mustache.parse(template);
+function renderSubjectsInto(data, table, append, max) {
+	if (!append) {
+		table.empty();
+	}
 	if (data.length > 0) {
-		if (!append) {
-			table.empty();
-		}
+		var template = $('#tmpl_row').html();
+		Mustache.parse(template);
 		var stop = (max > 0) ? Math.min(max, data.length) : data.length;
 		for (var i = 0; i < stop; i++) {
 			var treated = treatedSubjectData(data[i]);
 			var rendered = Mustache.render(template, treated);
 			table.append(rendered);
 		}
-	}
-	else if (!append) {
-		table.empty();
-		showSubjectsHint("No Subjects" + (searchstring ? " for “"+searchstring+"”" : ''));
 	}
 	return data.length;
 }
