@@ -15,6 +15,7 @@
     "base": "stu3",
     "oauth2": {
       "data.c3-pro.io": {
+        "antispam": "random-x-antispam-token",
         "client_id": "cool-client-id",
         "client_secret": "mysupersecretpassword"
       }

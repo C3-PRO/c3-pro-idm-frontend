@@ -194,6 +194,10 @@ function obtainAccessToken(endpoint, credentials, callback) {
         },
         body: 'grant_type=client_credentials',
     }
+    if (credentials.antispam) {
+    	options.headers['Antispam'] = credentials.antispam;
+    	options.headers['X-Antispam'] = credentials.antispam;
+    }
 	request(options, function(error, response, body) {
 		console.log('services/data/obtainAccessToken() response for', endpoint, 'error', error, 'response', response, 'body', body);
 		
