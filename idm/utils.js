@@ -20,7 +20,7 @@ else {
  */
 config.dataOrErrorFromJSONResponse = function(error, response, body, manipulateFuncOnSuccess) {
     var json = {
-        statusCode: response.statusCode,
+        statusCode: response ? response.statusCode : 503,
     };
     var parsed = body ? JSON.parse(body) : {};
     if (response.statusCode < 400) {
