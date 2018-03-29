@@ -120,8 +120,11 @@ function treatedSubjectData(data) {
 	if (data.bday) {
 		data.birthDate = moment(data.bday).format('L');
 	}
-	if (data.date_changed) {
-        data.changedDate = moment(data.date_changed).format('lll');
+	if (data.created) {
+        data.createdDate = moment(data.created).format('lll');
+    }
+	if (data.changed) {
+        data.changedDate = moment(data.changed).format('lll');
     }
     if (data.date_invited) {
         data.invitedDate = moment(data.date_invited).format('lll');
