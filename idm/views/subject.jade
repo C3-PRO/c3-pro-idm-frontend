@@ -22,20 +22,22 @@ block content
                 div(class="status#{subject.status}")
               td= subject.human_status
           tr
-            th SSSID *:
+            th SCCS-ID *:
             td(style="min-width:20em;")
               if 0 != sssid
                 span.subject_sssid= sssid
               else
                 input.form-control(name="sssid", type="text", value=subject.sssid)
           tr
-            th Name *:
+            th Full Name *:
             td.subject_name
               input.form-control(name="name", type="text", value=subject.name)
           tr
             th Birthdate *:
             td
               input.form-control.date-validate(name="bday", type="date", value=subject.bday, onblur="formatDateTime(this, 'YYYY-MM-DD');")
+              br
+              span.small Use format <tt>YYYY-MM-DD</tt>
           tr
             th Email Address:
             td
@@ -72,7 +74,7 @@ block content
           tr
             th= item.humanDisplay
             td
-              input.form-control.data-item-value(id="#{item.id}", name="#{item.id}", type="number")
+              input.form-control.data-item-value(id="#{item.id}", name="#{item.id}", type="number", step="0.1")
               if item.unit
                 = item.unit
             td
