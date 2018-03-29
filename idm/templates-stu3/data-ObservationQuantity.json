@@ -6,8 +6,8 @@
   "code": {
     "coding": [{
       "system": "{{system}}",
-      "code": "{{code}}",
-{{#display}}      "display": "{{display}}"{{/display}}
+      "code": "{{code}}"
+{{#display}},      "display": "{{display}}"{{/display}}
     }],
     "text": "{{humanDisplay}}"
   },
