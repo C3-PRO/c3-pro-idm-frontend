@@ -23,6 +23,11 @@
         "scope": "user/*.*"
       }
     },
+    "encryption": {
+      "data.c3-pro.io": {
+        "keyId": "public-key-id"
+      }
+    },
     "items": [{
       "id": "hcv-rna",
       "templateType": "ObservationQuantity",

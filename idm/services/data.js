@@ -10,6 +10,8 @@ var path = require('path');
 var mustache = require('mustache');
 var semver = require('semver');
 var querystring = require('querystring');
+var crypto = require('crypto');
+var crypto2 = require('crypto2');
 var config = require('../utils.js');
 var subjects = require('../services/subjects');
 var exports = module.exports = {};
@@ -246,7 +248,7 @@ function obtainAccessToken(contextId, host, config, endpoint, callback) {
 					headers['Antispam'] = config.antispam;
 					headers['X-Antispam'] = config.antispam;
 				}
-				accessHeaders[endpoint] = headers;
+				//accessHeaders[endpoint] = headers;	// TODO: deactivating; need to respect token validity period and test cached token before use
 				callback(contextId, headers, null);
 			} else {
 				throw "No access token received despite successful OAuth2 request";
@@ -295,7 +297,7 @@ function resourceForData(element, version, base) {
 		element.datetime = moment().format();
 	}
 	var mst = fs.readFileSync(path.join(__dirname, '../templates-'+base+'/data-'+element.templateType+'.json'))
-	var resource = mustache.render(mst.toString(), element);
+	var resource = mustache.render(mst.toString('utf8'), element);
 	var resourceType = ('resourceType' in element) ? element.resourceType : null;
 	
 	return [(resourceType || 'Observation'), version, resource];
@@ -350,11 +352,17 @@ function resourcesForData(uuid, data) {
 function submitResources(contextId, endpoint, headers, resources, callback) {
 	console.log('services/data/submitResources() submitting', resources.length, 'resources to', endpoint);
 	
+	var encryptionKeyId = null;
+	var host = url.parse(endpoint).hostname;
+	if (config.data && config.data.encryption && host in config.data.encryption) {
+		encryptionKeyId = config.data.encryption[host]['keyId'];
+	}
+	
 	var awaiting = 0;		// primitive dispatch grouping, please do better!
 	var errors = [];
 	for (var i = 0; i < resources.length; i++) {
 		awaiting += 1;
-		submitResource(endpoint, headers, resources[i], function(error) {
+		submitResource(endpoint, headers, encryptionKeyId, resources[i], function(error) {
 			awaiting -= 1;
 			
 			if (error != null) {
@@ -368,19 +376,38 @@ function submitResources(contextId, endpoint, headers, resources, callback) {
 	}
 }
 
-function submitResource(endpoint, headers, resource, callback) {
+function submitResource(endpoint, headers, encryptionKeyId, resource, callback) {
 	var resourceType = resource[0];
 	var FHIRVersion = resource[1];
 	var resourceBody = resource[2];	// already a JSON string
 	
 	var url = endpoint+(('/' == endpoint.slice(-1)) ? '' : '/')+resourceType;
-	var ourHeaders = headers || {};
-	if (semver.gte(FHIRVersion, '4.0.0')) {
-		ourHeaders['Content-type'] = 'application/fhir+json';	// supported since 3.0.0, but not all servers support it yet but should support the old one
-	} else {
-		ourHeaders['Content-type'] = 'application/json+fhir';
+	
+	// post as plain FHIR
+	if (encryptionKeyId == null) {
+		var ourHeaders = headers || {};
+		if (semver.gte(FHIRVersion, '4.0.0')) {
+			ourHeaders['Content-type'] = 'application/fhir+json';	// supported since 3.0.0, but not all servers support it yet but should support the old one
+		} else {
+			ourHeaders['Content-type'] = 'application/json+fhir';
+		}
+		postData(url, ourHeaders, resourceBody, callback);
+		return;
 	}
-	postData(url, ourHeaders, resourceBody, callback);
+	
+	// encrypted post
+	// TODO: assumes "/encfhir" in base URL in place of "/fhir", improve!
+	url = url.replace('/fhir/', '/encfhir/');
+	console.log('services/data/submitResource() encrypting', resourceType);
+	encryptedResourceData(resourceBody, encryptionKeyId, FHIRVersion, function(encryptedBody, error) {
+		if (error != null) {
+			console.error('services/data/submitResource() error encrypting:', error);
+		} else {
+			var ourHeaders = headers || {};
+			ourHeaders['Content-type'] = 'application/json';
+			postData(url, ourHeaders, encryptedBody, callback);
+		}
+	});
 }
 
 function postData(url, headers, body, callback) {
@@ -400,5 +427,49 @@ function postData(url, headers, body, callback) {
 			callback(null);
 		}
 	});
+}
+
+function encryptedResourceData(resourceData, keyId, version, callback) {
+	var publicKeyFile = '../'+keyId+'.pub';		// should probably be passed in instead of being read each time
+	
+    crypto2.readPublicKey(publicKeyFile).then(function(publicKey) {
+        crypto2.createPassword().then(function(AESKey) {
+        	var iv = null;
+        	if (semver.gte(process.version, '4.5.0')) {
+				iv = Buffer.alloc(16);
+			} else {
+				iv = new Buffer(16);
+			}
+			
+        	var cipher = crypto.createCipheriv('aes-256-cbc', AESKey, iv);
+        	var encrypted = cipher.update(resourceData, 'utf8', 'base64');
+        	encrypted += cipher.final('base64');
+        	
+        	// we need to use all-0-IV for compatibility with other C3-PRO
+        	// components, hence above manual 'crypto' use in place of 'crypto2':
+            //crypto2.encrypt.aes256cbc(resourceData, AESKey).then(function(encryptedHexData)
+            crypto2.encrypt.rsa(AESKey, publicKey).then(function(encryptedAESKey) {
+                
+                // create body and return
+                var body = JSON.stringify({
+                    key_id: keyId,
+                    symmetric_key: encryptedAESKey,
+                    message: encrypted,
+                    version: version,
+                });
+                
+                callback(body, null);
+            },
+            function(error) {
+                callback(null, 'Error RSA-encrypting key: '+error);
+            });
+        },
+        function(error) {
+            callback(null, 'Error creating AES encryption key: '+error);
+        });
+    },
+    function(error) {
+        callback(null, 'Error reading public key: '+error);
+    });
 }
 
