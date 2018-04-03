@@ -13,13 +13,36 @@
   },
   "data": {
     "base": "stu3",
+    "version": "3.0.1",
+    "oauth2": {
+      "data.c3-pro.io": {
+        "endpoint": "/api/oauth2",
+        "antispam": "random-x-antispam-token",
+        "client_id": "cool-client-id",
+        "client_secret": "mysupersecretpassword",
+        "scope": "user/*.*"
+      }
+    },
+    "encryption": {
+      "data.c3-pro.io": {
+        "keyId": "public-key-id"
+      }
+    },
     "items": [{
       "id": "hcv-rna",
-      "type": "ObservationQuantity",
+      "templateType": "ObservationQuantity",
       "system": "http://loinc.org",
-      "code": "???",
+      "code": "10676-5",
       "humanDisplay": "HCV-RNA level in serum or plasma",
       "unit": "[IU]/mL"
+    },
+    {
+      "id": "some-other",
+      "templateType": "ObservationQuantity",
+      "system": "http://loinc.org",
+      "code": "ANOTHER",
+      "humanDisplay": "Some other level to report",
+      "unit": "mg/mL"
     }]
   },
   "oauth": {

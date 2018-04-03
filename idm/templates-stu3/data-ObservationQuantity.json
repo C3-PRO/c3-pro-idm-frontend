@@ -1,21 +1,21 @@
 {
   "resourceType": "Observation",
   "subject": {
-    "reference": "Patient/{{uuid}}"
+    "reference": "Patient/{{{uuid}}}"
   },
   "code": {
     "coding": [{
-      "system": "{{system}}",
-      "code": "{{code}}",
-{{#display}}      "display": "{{display}}"{{/display}}
+      "system": "{{{system}}}",
+      "code": "{{{code}}}"
+{{#display}},      "display": "{{{display}}}"{{/display}}
     }],
-    "text": "{{humanDisplay}}"
+    "text": "{{{humanDisplay}}}"
   },
-  "effectiveDateTime": "{{datetime}}",
+  "effectiveDateTime": "{{{datetime}}}",
   "valueQuantity": {
-    "value": {{value}},
-    "unit": "{{unit}}",
+    "value": {{{value}}},
+    "unit": "{{{unit}}}",
     "system": "http://unitsofmeasure.org",
-    "code": "{{unit}}"
+    "code": "{{{unit}}}"
   }
 }

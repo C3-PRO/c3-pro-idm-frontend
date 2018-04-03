@@ -109,9 +109,11 @@ exports.getSubjectQRCode = function(opt, func) {
             var useLink = null;
             if (json.data) {
                 var now = moment();
+                
+                // check if we have an unused, unexpired link, and if so use it
                 for (var i = 0; i < json.data.length; i++) {
-                    var exp = json.data[i].exp ? moment(json.data[i].exp*1000) : null;
-                    if (!exp || exp > now) {
+                    var exp = json.data[i].exp ? moment(json.data[i].exp) : null;
+                    if (!json.data[i].linked_to && (!exp || exp > now)) {
                         useLink = json.data[i];
                         break;
                     }
@@ -125,15 +127,15 @@ exports.getSubjectQRCode = function(opt, func) {
                 });
             };
             
-            // request QR code for existing link or create a new one
+            // request QR code for existing link or first create a new link
             if (useLink) {
-                console.log('services/subjects/getSubjectQRCode(): reusing QR code for', useLink);
+                //console.log('services/subjects/getSubjectQRCode(): reusing QR code for', useLink);
                 callback(opt, useLink._id);
             }
             else {
                 //console.log('services/subjects/getSubjectQRCode(): creating new QR code')
                 exports.createSubjectLink(opt, function(cjson, opt) {
-                    console.log('services/subjects/getSubjectQRCode().createSubjectLink()', cjson);
+                    //console.log('services/subjects/getSubjectQRCode().createSubjectLink()', cjson);
                     if (cjson.data) {
                         callback(opt, cjson.data._id);
                     }

@@ -5,12 +5,19 @@
 var request = require('request');
 var moment = require('moment');
 var fs = require('fs');
+var url = require('url');
 var path = require('path');
 var mustache = require('mustache');
+var semver = require('semver');
+var querystring = require('querystring');
+var crypto = require('crypto');
+var crypto2 = require('crypto2');
 var config = require('../utils.js');
 var subjects = require('../services/subjects');
 var exports = module.exports = {};
 
+var accessHeaders = {};
+var addResearchDataContext = {};
 
 /**
 Takes an `opt` dictionary, which must contain `sssid`, will query all links for
@@ -21,11 +28,11 @@ filling the respective data template for all data items in `opt.data`.
 */
 exports.addResearchData = function(opt, func) {
 	if (!config.data || !config.data.base || !config.data.items || 0 == config.data.items) {
-		func({'errorMessage': "Not configured to add research data"}, opt);
+		func({errorMessage: "Not configured to add research data"}, opt);
 		return;
 	}
 	if (!opt.data || 0 == opt.data.length) {
-		func({'statusCode': 204}, opt);
+		func({statusCode: 204}, opt);
 		return;
 	}
 	if (!opt.sssid) {
@@ -36,62 +43,247 @@ exports.addResearchData = function(opt, func) {
 	subjects.getSubjectLinks(opt, function(json, opt) {
 		if (json.data) {
 			//console.log('services/data/addResearchData() body.data', opt.data);
-			console.log('services/data/addResearchData() subject links', json.data);
+			//console.log('services/data/addResearchData() subject links', json.data);
 			if (json.data.length > 0) {
-				var num = 0;
+				var enqueued = 0;
+				var contextId = newResearchDataContext(func, opt);
 				
 				// send to all active links (has `linked_to` and `linked_system` and not `withdrawn_on` and is not dupe)
 				var systems_completed = [];
 				for (var i = 0; i < json.data.length; i++) {
 					var lnk = json.data[i];
 					if (lnk.linked_to && lnk.linked_system && !lnk.withdrawn_on && systems_completed.indexOf(lnk.linked_system) < 0) {
+						enqueueResearchDataForContext(contextId);
+						systems_completed.push(lnk.linked_system);
+						enqueued += 1;
 						
-						// found a system to send data to, create resources for all data points that were supplied
-						try {
-							var resources = resourcesForData(lnk.linked_to, opt.data);
-							console.log(resources);
-							num += 1;
-						}
-						catch (exc) {
-							console.error('services/data/addResearchData() subject links', exc);
-							func({errorMessage: exc}, opt);
-							return;
-						}
+						var endpoint = lnk.linked_system;
+						ensureHasAccessToken(contextId, endpoint, function(oaContextId, headers, error) {
+							try {
+								if (!headers) {
+									throw "Failed to be granted access to "+endpoint+': '+error;
+								}
+								
+								// found a system to send data to: create resources for all data points that were supplied
+								var resources = resourcesForData(lnk.linked_to, opt.data);
+								submitResources(oaContextId, endpoint, headers, resources, function(rsrcContextId, errors) {
+									
+									// when all resources are done the context will call `func(json, opt)`;
+									var error = null;
+									if (errors != null && errors.length > 0) {
+										console.error('services/data/addResearchData() errors sending resources:', errors);
+										error = errors.join("\n");
+									}
+									dequeueResearchDataFromContext(rsrcContextId, error);
+								});
+							}
+							catch (exc) {
+								console.error('services/data/addResearchData() has access token exception:', exc);
+								dequeueResearchDataFromContext(oaContextId, exc);
+							}
+						});
 					}
 				}
-				if (num > 0) {
-					func(json, opt);
-				}
-				else {
-					func({errorMessage: "This subject has no active links at this time, must enroll and link before research data can be added"}, opt);
+				
+				// we're either waiting for access token calls to come back, or don't have active links and can call back already
+				if (0 == enqueued) {
+					endResearchDataContext(contextId, "This subject has no active links at this time, must enroll and link before research data can be added");
 				}
 			}
 			else {
 				func({errorMessage: "Nothing to add, please provide values"}, opt);
 			}
 		}
+		else if (!opt.isRetry) {
+			console.log('adding research data failed, retrying', json);
+			opt.isRetry = true;
+			func(json, opt);
+		}
 		else {
-			console.log('subject links errored', json.data);
+			console.error('adding research data errored', json);
 			func(json, opt);
 		}
 	});
 }
 
+function newResearchDataContext(func, opt) {
+	var contextId = Math.floor((1 + Math.random()) * 1000000).toString(16);
+	addResearchDataContext[contextId] = {
+		awaiting: 0,
+		func: func,
+		opt: opt,
+		errors: [],
+	};
+	return contextId;
+}
+
+function enqueueResearchDataForContext(contextId) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("enqueueResearchDataForContext for invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	ctx.awaiting = (ctx.awaiting || 0) + 1;
+}
+
+function dequeueResearchDataFromContext(contextId, error) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("dequeueResearchDataFromContext from invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	if (error) {
+		ctx.errors.push(error);
+	}
+	
+	ctx.awaiting = (ctx.awaiting || 0) - 1;
+	if (ctx.awaiting < 0) {
+		console.warn("dequeueResearchDataFromContext from context that is not awaiting a dequeue", contextId);
+	}
+	if (ctx.awaiting <= 0) {
+		endResearchDataContext(contextId);
+	}
+}
+
+function endResearchDataContext(contextId, error) {
+	if (!(contextId in addResearchDataContext)) {
+		console.error("endResearchDataContext on invalid contextId", contextId);
+		return;
+	}
+	var ctx = addResearchDataContext[contextId];
+	if (error) {
+		ctx.errors.push(error);
+	}
+	if (ctx.func) {
+		var msg = null;
+		if (ctx.errors.length > 0) {
+			msg = {errorMessage: ctx.errors.join("\n")};
+		} else {
+			msg = {statusCode: 201};
+		}
+		ctx.func(msg, ctx.opt);
+	}
+	delete addResearchDataContext[contextId];
+}
+
 
 /**
-Finds the template suitable for the given data "type", fills and returns it.
 
-Must at least have "type" and "value", and should be appropriate for the
+- parameter contextId: The context ID to pass through
+- parameter endpoint: Against which endpoint to authorize
+- parameter callback: A function to call, returns contextId for first arg,
+					  contains either a dictionary with all final headers
+					  (possibly an empty dict) or null (failed to get token) for
+					  second arg and an error string (if any) for thirg arg
+*/
+function ensureHasAccessToken(contextId, endpoint, callback) {
+	if (endpoint in accessHeaders) {
+		console.log('services/data/ensureHasAccessToken() using cached token');
+		callback(contextId, accessHeaders[endpoint], null);
+	}
+	else {
+		var host = url.parse(endpoint).hostname;
+		console.log('services/data/ensureHasAccessToken(): need token for endpoint '+endpoint+' (host:', host, ')');
+		if (config.data && config.data.oauth2 && host in config.data.oauth2) {
+			obtainAccessToken(contextId, host, config.data.oauth2[host], endpoint, callback);
+		}
+		else {
+			console.error('services/data/ensureHasAccessToken(): '+endpoint+' is not configured for OAuth2');
+			callback(contextId, null, endpoint+' is not configured for OAuth2');
+		}
+	}
+}
+
+function obtainAccessToken(contextId, host, config, endpoint, callback) {
+	var tokenURL = url.resolve('https://'+host, ('endpoint' in config) ? config.endpoint : null);
+	console.log('services/data/obtainAccessToken() tokenURL', tokenURL);
+	
+	// compose request
+	var client_id = oauth2FormEncode(config.client_id);
+	var client_secret = oauth2FormEncode(config.client_secret);
+	var auth = null;
+	if (semver.gte(process.version, '4.5.0')) {
+		auth = Buffer.from(client_id+':'+client_secret).toString('base64');
+	} else {
+		auth = new Buffer(client_id+':'+client_secret).toString('base64');
+	}
+	
+	var body = querystring.stringify({
+		'grant_type': 'client_credentials',
+		'scope': ('scope' in config) ? config.scope : 'user/*.*',
+		'aud': endpoint,
+	});
+	
+	var options = {
+		uri: tokenURL,
+		method : 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Authorization': 'Basic '+auth,
+			'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+		},
+		body: body,
+	};
+	if (config.antispam) {
+		options.headers['Antispam'] = config.antispam;
+		options.headers['X-Antispam'] = config.antispam;
+	}
+	
+	request(options, function(error, response, body) {
+		try {
+			if (error) {
+				throw error;
+			}
+			var parsed = body ? JSON.parse(body) : {};
+			if (response.statusCode >= 400) {
+				if (parsed != null && 'error' in parsed) {
+					throw parsed.error;
+				}
+				throw (response.statusMessage || "Error "+response.statusCode);
+			}
+			if ('access_token' in parsed) {
+				var token = parsed.access_token;
+				var headers = {'Authorization': 'Bearer '+token};
+				if (config.antispam) {
+					headers['Antispam'] = config.antispam;
+					headers['X-Antispam'] = config.antispam;
+				}
+				//accessHeaders[endpoint] = headers;	// TODO: deactivating; need to respect token validity period and test cached token before use
+				callback(contextId, headers, null);
+			} else {
+				throw "No access token received despite successful OAuth2 request";
+			}
+		} catch (exc) {
+			console.error('services/data/obtainAccessToken() error in token request: «', exc, '», response: ', response);
+			callback(contextId, null, "Failed retrieving access token: "+exc);
+		}
+	});
+}
+
+/** Encodes client-id/password for use in the "Authorization: Basic" header for
+OAuth2 calls. See https://tools.ietf.org/html/rfc6749#appendix-B.
+*/
+function oauth2FormEncode(value) {
+	return encodeURIComponent(value).replace('%20', '+');
+}
+
+
+/**
+Finds the template suitable for the given data "templateType", fills and returns
+it.
+
+Must at least have "templateType" and "value", and should be appropriate for the
 template to be used – this is not checked in code!
 
 Will throw, e.g. if the format for `datetime` is invalid.
 
 - parameter element: The dictionary to use to fill the template
+- parameter version: FHIR version of the resource
 - parameter base:    The base name of the directory the template is in, will be
 					 appended to "template-"
 */
-function resourceForData(element, base) {
-	if (!('type' in element) || !element.type || !('value' in element) || !element.value) {
+function resourceForData(element, version, base) {
+	if (!('templateType' in element) || !element.templateType || !('value' in element) || !element.value) {
 		return null;
 	}
 	if (element.datetime) {
@@ -104,13 +296,16 @@ function resourceForData(element, base) {
 	else {
 		element.datetime = moment().format();
 	}
-	var mst = fs.readFileSync(path.join(__dirname, '../templates-'+base+'/data-'+element.type+'.json'))
-	var resource = mustache.render(mst.toString(), element);
-	return resource;
+	var mst = fs.readFileSync(path.join(__dirname, '../templates-'+base+'/data-'+element.templateType+'.json'))
+	var resource = mustache.render(mst.toString('utf8'), element);
+	var resourceType = ('resourceType' in element) ? element.resourceType : null;
+	
+	return [(resourceType || 'Observation'), version, resource];
 }
 
 /**
-Returns resources for all data elements found in the input array.
+Returns resources for all data elements found in the input array. Return is an
+array of tuples containing (resourceType, FHIRVersion, resourceJSONString).
 
 Forwards to `resourceForData()`, hence may re-throw.
 */
@@ -132,7 +327,7 @@ function resourcesForData(uuid, data) {
 				elem[p] = dat[p];
 			}
 			elem.uuid = uuid;
-			var resource = resourceForData(elem, config.data.base);
+			var resource = resourceForData(elem, config.data.version, config.data.base);
 			if (resource) {
 				resources.push(resource);
 			}
@@ -142,5 +337,139 @@ function resourcesForData(uuid, data) {
 		}
 	}
 	return resources;
+}
+
+/**
+- parameter contextId: The context id to pass through
+- parameter endpoint:  The endpoint base URL to send the FHIR resource to
+- parameter headers:   The request header to use (should contain auth info)
+- parameter resources: An array of arrays of form ('resourceType', FHIR version,
+                       resourceObj)
+- parameter callback:  The callback to call once when all resources have been
+                       submitted or errored. Returns contextId and an array of
+                       errors (which may be null)
+*/
+function submitResources(contextId, endpoint, headers, resources, callback) {
+	console.log('services/data/submitResources() submitting', resources.length, 'resources to', endpoint);
+	
+	var encryptionKeyId = null;
+	var host = url.parse(endpoint).hostname;
+	if (config.data && config.data.encryption && host in config.data.encryption) {
+		encryptionKeyId = config.data.encryption[host]['keyId'];
+	}
+	
+	var awaiting = 0;		// primitive dispatch grouping, please do better!
+	var errors = [];
+	for (var i = 0; i < resources.length; i++) {
+		awaiting += 1;
+		submitResource(endpoint, headers, encryptionKeyId, resources[i], function(error) {
+			awaiting -= 1;
+			
+			if (error != null) {
+				errors.push(error);
+			}
+			
+			if (awaiting < 1) {
+				callback(contextId, errors);
+			}
+		})
+	}
+}
+
+function submitResource(endpoint, headers, encryptionKeyId, resource, callback) {
+	var resourceType = resource[0];
+	var FHIRVersion = resource[1];
+	var resourceBody = resource[2];	// already a JSON string
+	
+	var url = endpoint+(('/' == endpoint.slice(-1)) ? '' : '/')+resourceType;
+	
+	// post as plain FHIR
+	if (encryptionKeyId == null) {
+		var ourHeaders = headers || {};
+		if (semver.gte(FHIRVersion, '4.0.0')) {
+			ourHeaders['Content-type'] = 'application/fhir+json';	// supported since 3.0.0, but not all servers support it yet but should support the old one
+		} else {
+			ourHeaders['Content-type'] = 'application/json+fhir';
+		}
+		postData(url, ourHeaders, resourceBody, callback);
+		return;
+	}
+	
+	// encrypted post
+	// TODO: assumes "/encfhir" in base URL in place of "/fhir", improve!
+	url = url.replace('/fhir/', '/encfhir/');
+	console.log('services/data/submitResource() encrypting', resourceType);
+	encryptedResourceData(resourceBody, encryptionKeyId, FHIRVersion, function(encryptedBody, error) {
+		if (error != null) {
+			console.error('services/data/submitResource() error encrypting:', error);
+		} else {
+			var ourHeaders = headers || {};
+			ourHeaders['Content-type'] = 'application/json';
+			postData(url, ourHeaders, encryptedBody, callback);
+		}
+	});
+}
+
+function postData(url, headers, body, callback) {
+	var options = {
+		uri: url,
+		method : 'POST',
+		headers: headers,
+		body: body,
+	};
+	
+	console.log('services/data/postData() submitting to', url);
+	request(options, function(error, response, body) {
+		if (error != null || response.statusCode >= 400) {
+			console.error('services/data/postData() response error', error, 'body', body);
+			callback(error || response.statusMessage || "Error submitting resource: "+response.statusCode);
+		} else {
+			callback(null);
+		}
+	});
+}
+
+function encryptedResourceData(resourceData, keyId, version, callback) {
+	var publicKeyFile = '../'+keyId+'.pub';		// should probably be passed in instead of being read each time
+	
+    crypto2.readPublicKey(publicKeyFile).then(function(publicKey) {
+        crypto2.createPassword().then(function(AESKey) {
+        	var iv = null;
+        	if (semver.gte(process.version, '4.5.0')) {
+				iv = Buffer.alloc(16);
+			} else {
+				iv = new Buffer(16);
+			}
+			
+        	var cipher = crypto.createCipheriv('aes-256-cbc', AESKey, iv);
+        	var encrypted = cipher.update(resourceData, 'utf8', 'base64');
+        	encrypted += cipher.final('base64');
+        	
+        	// we need to use all-0-IV for compatibility with other C3-PRO
+        	// components, hence above manual 'crypto' use in place of 'crypto2':
+            //crypto2.encrypt.aes256cbc(resourceData, AESKey).then(function(encryptedHexData)
+            crypto2.encrypt.rsa(AESKey, publicKey).then(function(encryptedAESKey) {
+                
+                // create body and return
+                var body = JSON.stringify({
+                    key_id: keyId,
+                    symmetric_key: encryptedAESKey,
+                    message: encrypted,
+                    version: version,
+                });
+                
+                callback(body, null);
+            },
+            function(error) {
+                callback(null, 'Error RSA-encrypting key: '+error);
+            });
+        },
+        function(error) {
+            callback(null, 'Error creating AES encryption key: '+error);
+        });
+    },
+    function(error) {
+        callback(null, 'Error reading public key: '+error);
+    });
 }
 
